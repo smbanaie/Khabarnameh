@@ -1,0 +1,90 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css"
+      href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+
+    <form action="" method="post" class="form-horizontal" enctype="multipart/form-data">
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+        {% end if %}
+
+        {% if handler.has_error() %}
+        {% for m in handler.get_errors() %}
+        <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end %}
+        {% end if %}
+
+        <div class="form-body">
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">عنوان تالار گفتگو:</label>
+
+                <div class="col-md-4">
+                    <input class="form-control" required="required" maxlength="70" name="forum_name" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">عکس تالار گفتگو </label>
+
+                <div class="col-md-4">
+                    <input
+                            class="form-control"
+                            required="required" name="forum_pic" type="file">
+                </div>
+            </div>
+
+            <div class="">
+                <label class="col-md-4 control-label">این تالار گفتگو بعدا فعال شود.</label>
+
+                <div class="col-md-6">
+                    <input name="status" type="checkbox"><span>بله</span>
+                </div>
+
+            </div>
+
+
+            <div class="col-md-2 col-md-offset-5">
+                <button type="submit" class="R_butt_blue">افزودن</button>
+            </div>
+        </div>
+        <input type="hidden" name="method" value="add">
+        {% module xsrf_form_html() %}
+    </form>
+
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+
+
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript">
+    $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            forum_name: "required",
+            forum_pic: "required"
+        },
+        messages: {
+            forum_name: "نام تالار گفتگو را وارد کنید.",
+            forum_pic: "تصویری برای تالار گفتگو انتخاب کنید."
+        }
+    });
+</script>
+
+{% end block bottom_script %}

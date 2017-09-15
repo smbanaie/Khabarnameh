@@ -1,0 +1,267 @@
+{% extends "../main_template.html" %}
+
+{% block csses %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+<div class="row margin-0">
+
+    <div class="col-md-8 col-sm-8 col-xs-10 col-md-offset-2 col-sm-offset-2 col-xs-offset-1">
+
+        <div class="row">
+            <div class="col-md-12 padding-0">
+                <div class="register_section">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="box active">
+                            <div class="sp1">1</div>
+                            <div class="sp2">مرحله اول</div>
+                            <div class="fa fa-arrow-left vertical-middle font-size-18 colorGray"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="box">
+                            <div class="sp1">2</div>
+                            <div class="sp2">اطلاعات تکمیلی</div>
+                            <div class="fa fa-arrow-left vertical-middle font-size-18 colorGray"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="box">
+                            <div class="sp1">3</div>
+                            <div class="sp2">ثبت نهایی !</div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="clearfix"></div>
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="colorRed font-size-12 col-md-12 text-center">{{ m }}</div>
+    {% end if %}
+    <div class="clearfix"></div>
+
+    <div class="col-md-10 col-md-offset-1">
+        <div class="row">
+
+
+            <div class="rBox signup">
+                <div class="head">ثبت نام مراکز آموزشی</div>
+                <div class="body">
+                    <div class="display-table width-100-darsad margin-20-center">
+                        <div class="display-table-cell vertical-middle width-20-darsad text-center colorGray">
+                            <div class="font-size-12">شروع ثبت نام !</div>
+                            <div class="font-size-36 margin-20-center">
+                                <i class="fa fa-chevron-left"></i>
+                                <span>{{ plan['plan_name'] }}</span>
+                            </div>
+                            <div class="margin-20-center font-size-9">مرحله اول</div>
+                        </div>
+                        <div class="display-table-cell vertical-middle width-85-darsad">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <form action="{{ reverse_url('plans_order_by_step', plan['id'], "Step2") }}" method="post"
+                                          class="form-horizontal">
+                                        <div class="form-body">
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">نام کاربری :</label>
+
+                                                <div class="col-md-5">
+                                                    <input class="form-control" required="required"
+                                                           maxlength="25"
+                                                           name="user_name" type="text">
+                                                    <span class="help-block">نام کاربری میتواند شامل حروف لاتین و اعداد باشد.</span>
+                                                </div>
+                                            </div>
+                                            {#                                        <div class="form-group">#}
+                                            {#                                            <label class="col-md-4 control-label">نام مرکز آموزشی :</label>#}
+                                            {#                                            <div class="col-md-5">#}
+                                            {#                                                <input class="form-control" required="required" name="school_name" type="text">#}
+                                            {#                                                <span class="help-block">نام را به فارسی وارد کنید.</span>#}
+                                            {#                                            </div>#}
+                                            {#                                        </div>#}
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">رمز عبور :</label>
+
+                                                <div class="col-md-5">
+                                                    <input class="form-control" required="required" id="pass"
+                                                           name="pass"
+                                                           type="password">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">تکرار رمز عبور :</label>
+
+                                                <div class="col-md-5">
+                                                    <input class="form-control" required="required" name="pass_confirm"
+                                                           type="password">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">استان :</label>
+
+                                                <div class="col-md-5">
+                                                    <select class="select" required="required" name="user_province">
+                                                        <option value="">انتخاب کنید.</option>
+                                                        {% for i in province %}
+                                                        {% if i['id'] != 0 %}
+                                                        <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                                                        {% end %}
+                                                        {% end %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">شهر :</label>
+
+                                                <div class="col-md-5">
+                                                    <select class="select" required="required" name="user_city">
+                                                        <option value="">انتخاب کنید.</option>
+                                                        <option value="1">شهر</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">شناسه معرف :</label>
+
+                                                <div class="col-md-5">
+                                                    <input class="form-control" maxlength="5" name="visitor" type="text">
+                                                    <span class="help-block">در صورت وجود معرف ، شناسه وی را وارد کنید.</span>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+
+
+                                        <div class="form-actions fluid">
+                                            <div class="col-md-12 text-center">
+                                                <button type="submit" class="butt">مرحله بعدی <span
+                                                        class="fa fa-arrow-left vertical-middle"></span></button>
+                                            </div>
+                                        </div>
+                                        {% module xsrf_form_html() %}
+                                    </form>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript">
+    jQuery.validator.addMethod("latin_numbers", function (value, element) {
+        return this.optional(element) || /^\w+$/.test(value);
+    }, "Please specify the correct domain for your documents");
+
+    var frm = $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            user_name: {
+                required: true,
+                latin_numbers: true,
+                minlength: 5
+            },
+            visitor: {
+                required: false,
+                minlength: 5,
+                maxlength: 5,
+                remote: {
+                    url: "{{ reverse_url('plans_order', plan['id']) }}",
+                    type: "put",
+                    data: {
+                        id: function () {
+                            return $("input[name=visitor]").val();
+                        },
+                        _xsrf: '{{ handler.xsrf_token }}'
+                    }
+                }
+            },
+            {#            school_name: "required",#}
+            pass: "required",
+            pass_confirm: {
+                equalTo: "#pass"
+            },
+            user_province: "required",
+            user_city: "required"
+        },
+        messages: {
+            visitor: {
+                remote: "شناسه معرف معتبر نمی باشد.",
+                minlength: "شناسه معرف {0} کاراکتر است.",
+                maxlength: "شناسه معرف {0} کاراکتر است."
+            },
+            user_name: {
+                required: "نام کاربری خود را وارد کنید.",
+                latin_numbers: "کاراکتر های مجاز وارد کنید.",
+                minlength: "حداقل {0} کاراکتر وارد کنید."
+            },
+            {#            school_name: "نام مرکز آموزشی را وارد کنید.",#}
+            pass: "رمز عبور خود را وارد کنید.",
+            pass_confirm: {
+                required: "تکرار رمز عبور را وارد کنید.",
+                equalTo: "رمز عبور و تکرار آن یکسان نیستند."
+            },
+            user_province: "استان خود را وارد کنید.",
+            user_city: "شهر خود را وارد کنید."
+        }
+    });
+
+    $(".select").select2({
+        placeholder: "انتخاب کنید"
+    });
+    $(".select[name=user_province]").select2({
+        placeholder: "انتخاب کنید"
+    }).on("change", function () {
+        var noptions = "";
+        $.ajax({
+            data: {pid: $(this).select2("val"), _xsrf: '{{ handler.xsrf_token }}'},
+            type: 'post',
+            cache: true,
+            url: '{{ reverse_url("get_cities") }}',
+            async: true,
+            success: function (output3) {
+                if (output3 != '0') {
+                    var first_id = output3['city'][0]['id'];
+                    for (var i in output3['city']) {
+                        noptions += "<option value='" + output3['city'][i]['id'] + "'>" + output3['city'][i]['name'] + "</option>";
+                    }
+                }
+                $(".select[name=user_city]").html(noptions).select2("val", first_id);
+            }, complete: function (output) {
+            }
+        });
+    });
+
+
+</script>
+{% end block bottom_script %}

@@ -1,0 +1,306 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="row margin-0">
+        <div class="colorGreen font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    </div>
+    {% end if %}
+
+    {% if subsystems %}
+        <form action="" method="post">
+            <div class="form-horizontal">
+                <div class="form-body">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">زیر سیستم ها :</label>
+
+                        <div class="col-md-4">
+                            <select class="select" name="subsystem">
+                                {% for i in subsystems %}
+
+    {#                            <option  value="{{ i['id'] }}">{{ i['name'] }}</option>#}
+                                <option {% if  sub_id !="all" %}{% if i['id']== int(sub_id) %}selected{% end %}{% end %} value="{{ i['id'] }}">{{ i['name'] }}</option>
+                                {#                        <input type="hidden" name="subsystem_se" value="{{ i['id'] }}">#}
+                                {% end %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="R_butt_blue _select">جستجو</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" value="search" name="search">
+            {% module xsrf_form_html() %}
+        </form>
+        {% end %}
+
+<div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none margin-10-center"></div>
+    <div class="clearfix"></div>
+    <div class="_list">
+    {% if subsystems %}
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">کاربر</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">سیستم</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">تاریخ</div>
+            <div class="col-md-2 col-sm-3 col-xs-3">وضعیت</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">نمایش</div>
+            <div class="col-md-1 col-sm-1 col-xs-1">حذف</div>
+        </div>
+
+        <div id="result_container">
+            {% set cnt = 1 %}
+            {% for i in suggestion %}
+            <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+                <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __text">{{ i['user']['name'] }}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __text">{{ i['system_name'] }}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-8 padding-top-5">{{ i['date'] }}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-8 padding-top-5 {% if i['status'] == "READ" %}colorGray{% else %}colorBlue{% end %}">{% if i['status'] == "READ" %}خوانده
+                    شده{% else %}پیام جدید{% end %}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __butts">
+                    <button class="{% if i['status'] == "UNREAD" %}R_butt_blue{% else %}R_butt_gray{% end %} do_show font-size-8"
+                            data-id="{{ i['id'] }}">نمایش
+                    </button>
+                </div>
+                <div class="col-md-1 col-sm-1 col-xs-1 __butts" data-id="{{ i['id'] }}">
+                    <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            {% set cnt += 1 %}
+            {% end %}
+        {% else %}
+            <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">کاربر</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">تاریخ</div>
+            <div class="col-md-2 col-sm-3 col-xs-3">وضعیت</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">نمایش</div>
+            <div class="col-md-1 col-sm-1 col-xs-1">حذف</div>
+        </div>
+
+        <div id="result_container">
+            {% set cnt = 1 %}
+            {% for i in suggestion %}
+            <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+                <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+                <div class="col-md-3 col-sm-3 col-xs-3 __text">{{ i['user']['name'] }}</div>
+                <div class="col-md-3 col-sm-3 col-xs-3 __text font-size-8 padding-top-5">{{ i['date'] }}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-8 padding-top-5 {% if i['status'] == "READ" %}colorGray{% else %}colorBlue{% end %}">{% if i['status'] == "READ" %}خوانده
+                    شده{% else %}پیام جدید{% end %}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __butts">
+                    <button class="{% if i['status'] == "UNREAD" %}R_butt_blue{% else %}R_butt_gray{% end %} do_show font-size-8"
+                            data-id="{{ i['id'] }}">نمایش
+                    </button>
+                </div>
+                <div class="col-md-1 col-sm-1 col-xs-1 __butts" data-id="{{ i['id'] }}">
+                    <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            {% set cnt += 1 %}
+            {% end %}
+
+        {% end %}
+            {% if cnt == 1 %}
+            <div class="row _row_w text-center">
+                <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+            </div>
+            {% end %}
+
+            <div class="row _loading display-none" id="page_loader">
+                <div class="col-md-12 margin-top-30">
+                    <div class="loading display-block"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+<div class="margin-30-center clearfix"></div>
+
+<div class="modal fade in" id="suggestion_show" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog width-55-darsad">
+        <div class="modal-content border-radius-7">
+            <div class="modal_header">
+                <span>نمایش پیام</span>
+                <span class="pull-left fa fa-times cursor-pointer" data-dismiss="modal" aria-hidden="true"></span>
+            </div>
+            <div class="modal_body">
+                <div class="row margin-10-center">
+
+                    <div class="row _loading display-none" id="modal_loader">
+                        <div class="col-md-12 margin-30-center">
+                            <div class="loading display-block"></div>
+                        </div>
+                    </div>
+                    <div id="modal_content" class="display-none">
+                        <div class="col-md-12 text-justify" id="suggestion_txt"></div>
+                        <div class="row margin-0">
+                            <div class="col-md-12 margin-top-10">
+                                <hr class="margin-5-center">
+                            </div>
+                        </div>
+                        <div class="col-md-12 margin-top-10 text-right font-size-9 colorb5b5b5"
+                             id="suggestion_viewer"></div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div id="modal_error" class="display-none colorRed margin-10-center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+<script type="text/html" id="__rows">
+    <div class="row <%= row_color %> text-center" data-id="<%= id %>">
+        <div class="col-md-1 col-sm-1 col-xs-1"><%= cnt %></div>
+        <div class="col-md-3 col-sm-3 col-xs-3 __text"><%= name %></div>
+        <div class="col-md-3 col-sm-3 col-xs-3 __text font-size-8 padding-top-5"><%= date %></div>
+        <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-8 padding-top-5 <%= status_color %>"><%= status %></div>
+        <div class="col-md-2 col-sm-2 col-xs-2 __butts">
+            <button class="<%= show_butt %> do_show font-size-8" data-id="<%= id %>">نمایش</button>
+        </div>
+        <div class="col-md-1 col-sm-1 col-xs-1 __butts" data-id="<%= id %>">
+            <button class="butt delete" data-id="<%= id %>"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    $("[data-toggle=tooltip]").tooltip();
+    $(".select").select2();
+    var modal_loading = $("#modal_loader");
+    var modal_content = $("#modal_content");
+
+    var modal_error = $("#modal_error");
+
+    $(document).on('click', '.butt.delete', function () {
+        if (confirm("آیا مطمئن هستید ؟ این عملیات غیر قابل بازگشت است.")) {
+            var _id = $(this).attr("data-id");
+            $.ajax({
+                data: {_id: _id, _xsrf: '{{ handler.xsrf_token }}', method: "delete"},
+                type: 'put',
+                url: '{{ reverse_url('system_suggestions') }}',
+                success: function (data) {
+                    if (data['status']) {
+                        alert("پیام مورد نظر با موفقیت حذف شد.");
+                        $(".row[data-id=" + _id + "]").slideUp();
+                    } else {
+                        alert("خطا در حذف پیام. مجدداً تلاش کنید.");
+                    }
+                }
+            });
+        }
+
+    });
+
+    $(document).on('click', '.do_show', function () {
+        modal_content.hide();
+
+        var _id = $(this).attr("data-id");
+
+        $('#suggestion_show').modal('show');
+
+        modal_loading.fadeIn();
+
+        $.ajax({
+            data: {_id: _id, _xsrf: '{{ handler.xsrf_token }}', method: "get"},
+            type: 'put',
+            url: '{{ reverse_url('system_suggestions') }}',
+            success: function (data) {
+                if (data['status']) {
+                    $("#suggestion_txt").text(data['text']);
+                    $("#suggestion_viewer").text("مشاهده شده توسط : " + data['read_by']);
+                    modal_loading.hide();
+                    modal_content.fadeIn();
+                } else {
+                    modal_loading.hide();
+                    modal_content.hide();
+                    modal_error.removeClass("colorGreen").addClass("colorRed").text("خطا در دریافت متن. مجدداً تلاش نمایید.").show();
+                }
+            }
+        });
+    });
+
+
+    var glob_input = {_xsrf: '{{ handler.xsrf_token }}', page: 1};
+
+    var loading = $("#page_loader");
+
+    var page = 1;
+    var is_loading = false;
+    var is_any_more = true;
+
+    $(window).scroll(function () {
+
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+            if (is_any_more && is_loading == false) //there's more data to load
+            {
+                glob_input['page']++;
+                is_loading = true;
+                loading.show();
+                {#                res.hide();#}
+                $.ajax({
+                    type: 'post',
+                    data: glob_input,
+                    success: function (data) {
+                        var j = "";
+                        var cnt = ((glob_input['page'] - 1) * 12) + 1;
+                        if (data['status']) {
+                            if (data['data']) {
+                                for (var i in data['data']) {
+                                    j += _.template($("#__rows").html())(
+                                            {
+                                                id: data['data'][i]['id'],
+                                                name: data['data'][i]['user']['name'],
+                                                row_color: (cnt % 2) ? "_row_g" : "_row_w",
+                                                cnt: cnt,
+                                                date: data['data'][i]['date'],
+                                                status: (data['data'][i]['status'] == "READ") ? "خوانده شده" : "خوانده نشده",
+                                                status_color: (data['data'][i]['status'] == "READ") ? "colorGray" : "colorBlue",
+                                                show_butt: (data['data'][i]['status'] == "READ") ? "R_butt_gray" : "R_butt_blue"
+                                            }
+                                    );
+                                    cnt++;
+                                }
+                                $("#result_container").append(j);
+                            } else {
+                                is_any_more = false;
+                            }
+                        }
+
+                        if (!data['more']) {
+                            is_any_more = false;
+                        }
+                        {#                        res.show();#}
+                        {#                        re_height();#}
+                        loading.hide();
+                        is_loading = false;
+                    }
+                });
+
+            }
+        }
+    });
+
+</script>
+{% end block bottom_script %}

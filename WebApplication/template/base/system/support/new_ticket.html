@@ -1,0 +1,140 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<!--<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>-->
+<style>
+    .mce-edit-area{
+        border-width: 1px 1px 0 0 !important;
+    }
+</style>
+{% end other_head body %}
+{% block container %}
+        <form action="" id="" method="post" enctype="multipart/form-data" class="form-body">
+            <div class="col-md-12 ">
+                <div class="form-horizontal">
+                    {% set m = handler.get_flash('msg') %}
+                    {% if m != None %}
+                    <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+                    {% end if %}
+
+                    {% if handler.has_error() %}
+                    {% for m in handler.get_errors() %}
+                    <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+                    {% end %}
+                    {% end if %}
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">موضوع :</label>
+
+                        <div class="col-md-9">
+                            <input class="form-control" autocomplete="off" name="topic" required="required">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">وضعیت :</label>
+                        <div class="col-md-3">
+                                <select name="priority" id="inputPriority" class="form-control">
+                                        <option value="High">
+                                        ضروری
+                                        </option>
+                                        <option value="Medium" selected="selected">
+                                        مهم
+                                        </option>
+                                        <option value="Low">
+                                        معمولی
+                                        </option>
+                                </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">متن پیام :</label>
+
+                        <div class="col-md-9">
+                         <textarea name="full_text" class="Yekan" title="متن اصلی"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">ضمیمه :</label>
+
+                        <div class="col-md-9">
+                            <input type="file" name="attachment" data-dismiss="fileupload" id="inputAttachments"
+                                   class="form-control fileupload"/>
+                            <div id="fileUploadsContainer"></div>
+                            <div class="col-md-12 col-xs-12 ticket-attachments-message text-muted">
+                                اجازه افزودن فایل: '.jpg','.png','.gif','.bmp','.jpeg','.zip','.rar'
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-3 text-center">
+                    <button class="R_butt_blue " type="submit">ارسال</button>
+                    <a href="#" class="btn btn-default"> انصراف</a>
+                </div>
+            </div>
+            {% module xsrf_form_html() %}
+
+        </form>
+    </div>
+
+
+
+{% end block container %}
+{%block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/tinymce/tinymce.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript">
+    tinymce.init({
+        selector: "textarea[name=full_text]",
+        menubar: false,
+        toolbar_items_size: 'small',
+        theme: "modern",
+        height: 200,
+        plugins: [
+            "advlist autolink link lists charmap preview hr anchor pagebreak",
+            "searchreplace wordcount visualblocks visualchars nonbreaking",
+            "save table contextmenu directionality emoticons template paste textcolor"
+        ],
+        language: 'fa',
+        directionality: 'rtl',
+        content_css: "{{ static_url('plugins/tinymce/css/content.css') }}",
+        font_formats: "Yekan=Yekan; Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n",
+
+        toolbar1: "fullpage | undo redo | bold italic underline strikethrough | ltr rtl | alignleft aligncenter alignright alignjustify | fontselect fontsizeselect",
+        toolbar2: "cut copy paste | searchreplace | outdent indent  link unlink anchor  | preview | forecolor backcolor | table | hr removeformat | emoticons | fullscreen | visualblocks restoredraft",
+
+        style_formats: [
+            {title: 'Bold text', inline: 'b'},
+            {title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},
+            {title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},
+            {title: 'Example 1', inline: 'span', classes: 'example1'},
+            {title: 'Example 2', inline: 'span', classes: 'example2'},
+            {title: 'Table styles'},
+            {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
+        ]
+    });
+
+    var _frm = $("form");
+    _frm.validate({
+        errorClass: "colorOrange",
+        rules: {
+            topic: "required",
+            full_text: "required"
+        },
+        messages: {
+            topic: "موضوع درخواست را مشخص کنید",
+            full_text: "متن اصلی را وارد کنید."
+
+        }
+    });
+
+</script>
+{% end block bottom_script %}

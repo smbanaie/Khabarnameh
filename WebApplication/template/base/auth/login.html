@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>{{ title }}</title>
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/bootstrap/css/bootstrap-rtl.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/bootstrap/theme/bootstrap-theme.min.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/fonts.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/font-awesome/css/font-awesome.min.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/index/index2.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/common.css') }}">
+
+    <link rel="shortcut icon" href="{{ static_url('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ static_url('favicon.ico') }}" type="image/x-icon">
+
+</head>
+<body>
+
+
+
+
+<div class="container" style="height: 100vh">
+    <div class="rB">
+        <div class="rect" style="background-color: {{ _sys['color'] }}">
+            <div class="display-table width-100-darsad ">
+                <div class="display-table-cell width-100-darsad vertical-middle">
+                    <img src="{{ static_url("upload/logos/" + _sys['pic']) }}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="l_c">
+        <div class="login_box">
+
+            <div class="title">
+                <div>سیستم جامع اطلاع رسانی</div>
+                <div class="font-size-12">{{ _sys['pname'] }}</div>
+            </div>
+
+            <div class="row margin-0">
+                <form method="post" enctype="multipart/form-data" action="{{ reverse_url('login', system_id) }}">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="row margin-10-center">
+                            <div class="col-md-4 col-sm-6 col-md-offset-4 col-sm-offset-3">
+                                <input class="form-control" {% if system_id == '1' %} value="demo" {% end %} name="_uname" placeholder="نام کاربری">
+                            </div>
+                        </div>
+                        <div class="row margin-10-center">
+                            <div class="col-md-4 col-sm-6 col-md-offset-4 col-sm-offset-3">
+                                <input class="form-control" {% if system_id == '1' %} value="demo" {% end %} name="_pass" type="password" placeholder="رمز ورود">
+                            </div>
+                        </div>
+                        <div class="row margin-10-center">
+                            <div class="col-md-4 col-sm-6 col-md-offset-4 col-sm-offset-3">
+                                <button class="R_butt_blue width-50-darsad" type="submit">ورود</button>
+                            </div>
+                        </div>
+                        <div class="row margin-10-center">
+                            <div class="col-md-4 col-sm-6 col-md-offset-4 col-sm-offset-3">
+                                {% if handler.has_error() %}
+                                {% for m in handler.get_errors() %}
+                                <div class="colorRed font-size-10 text-center margin-10-center">{{ m }}</div>
+                                {% end %}
+                                {% end if %}
+                            </div>
+                        </div>
+                    </div>
+                    {% module xsrf_form_html() %}
+                </form>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2 dl_box">
+
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <a href="{{ reverse_url("download_app", system_id) }}">
+                                <img class="dl android_dl" src="" alt="">
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <img class="dl ios_dl" src="" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+{% if sub_data['status'] == True %}
+<div class="container" style="width:85%">
+    <div class="row">
+    {% for sub_ in sub_data['data'] %}
+        <div class="col-xs-4 col-sm-2">
+            <div class="thumbnail col-xs-12 m-no-padding" style="background-color: #f5f5f5;border-radius: 6px">
+                <a href="{{ reverse_url("login", sub_['id']) }}"><img style="width:100%;height:170px;border:5px solid #f5f5f5" id="" src="{{ static_url("upload/logos/" + sub_['img']) }}"></a>
+                <div class="caption">
+                    <h4 style="text-align: center">زیر سیستم</h4>
+                    <a href="{{ reverse_url("login", sub_['id']) }}" class="system_container">
+                        <h4 style="text-align: center">{{ sub_['name'] }}</h4>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% end for %}
+    </div>
+</div>
+{% end if %}
+
+<footer>کلیه حقوق محفوظ است.</footer>
+
+
+<script type="text/javascript" src="/static/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+</body>
+</html>

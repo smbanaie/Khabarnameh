@@ -1,0 +1,256 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}"/>
+{% end other_head body %}
+
+
+{% block container %}
+<div class="col-md-10 col-md-offset-1">
+    <div class="row">
+        <form action="{{reverse_url("system_insert_subsystem") }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+            {% set m = handler.get_flash('msg') %}
+            {% if m != None %}
+            <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+            {% end if %}
+
+            {% if handler.has_error() %}
+            {% for m in handler.get_errors() %}
+            <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+            {% end %}
+            {% end if %}
+            <div class="col-sm-7">
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">نام کاربری :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" name="user_name" maxlength="11" required="required" placeholder="شماره موبایل">
+                    <small class="help-block">
+                        نام کاربری حتما باید شماره موبایل باشد.
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">رمز عبور :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" id="pass" name="pass" type="password">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">تکرار رمز عبور :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" name="pass_confirm" type="password">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">استان :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <select class="select" required="required" name="user_province">
+                        <option value="">انتخاب کنید.</option>
+                        {% for i in province %}
+                        {% if i['id'] != 0 %}
+                        <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                        {% end %}
+                        {% end %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">شهر :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <select class="select" required="required" name="user_city">
+                        <option value="">انتخاب کنید.</option>
+                        <option value="1">شهر</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">نام :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" name="fname" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">نام خانوادگی :</label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" name="lname" type="text">
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label"><span class="">ایمیل</span> <span class="font-size-8 colorb5b5b5">(اختیاری)</span></label>
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" name="email" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">نام زیر سیستم:</label>
+
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" name="school_name" type="text">
+                    <span class="help-block">نام را به فارسی وارد کنید.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">شماره تماس :</label>
+
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <input class="form-control" required="required" name="phone" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 col-sm-4 col-xs-5 control-label">آدرس زیر سیستم  :</label>
+
+                <div class="col-md-8 col-sm-8 col-xs-7">
+                    <textarea class="form-control no-resize" required="required" name="address"></textarea>
+                </div>
+            </div>
+
+            <br>
+
+            {% module xsrf_form_html() %}
+        </div>
+        <div class="col-sm-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <div>آپلود تصویر :</div>
+                    <div class="fileupload fileupload-new text-center" data-provides="fileupload">
+                        <div id="photo_show" class="fileupload-new thumbnail" style="width: 100%; height: auto;">
+                            <img id="logo_image" src="{{ static_url("images/public/school1.png") }}" alt=""/>
+                        </div>
+                        <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 145px;max-height: 100px; line-height: 20px;"></div>
+                        <div>
+                            <span class="btn backgroundBlue colorWhite btn-file">
+                            <span class="fileupload-new font-size-10"><i class="fa fa-paper-clip"></i> انتخاب تصویر </span>
+                            <span class="fileupload-exists font-size-10"><i class="fa fa-undo"></i> تغییر</span>
+                            <input name="pic" type="file" class="ejbari default"/>
+                            </span>
+                            <a href="#" class="btn backgroundRed colorWhite fileupload-exists" data-dismiss="fileupload"><i class="fa fa-trash-o"></i> حذف</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-success create_school_but">ثبت زیر سیستم !</button>
+                </div>
+            </div>
+        </form>
+        <span><br></span>
+    </div>
+</div>
+{% end block container %}
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+<script>
+    jQuery.validator.addMethod("latin_numbers", function (value, element) {
+        return this.optional(element) || /^\w+$/.test(value);
+    }, "Please specify the correct domain for your documents");
+
+    var frm = $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            user_name: {
+                required: true,
+                latin_numbers: true,
+                minlength: 11,
+                maxlength:11,
+                digits: true
+
+            },
+            pass: "required",
+            pass_confirm: {
+                equalTo: "#pass"
+            },
+            user_province: "required",
+            user_city: "required",
+            fname: "required",
+            lname: "required",
+            school_name: "required",
+            email: {
+                required: false,
+                email: true
+            },
+            phone: {
+                required: true,
+                digits: true
+            },
+            address: "required",
+
+        },
+        messages: {
+            user_name: {
+                required: "نام کاربری خود را وارد کنید.",
+                latin_numbers: "نام کاربری حتما باید شماره موبایل باشد.",
+                minlength: "حداقل {0} کاراکتر وارد کنید.",
+                maxlength: "حداکثر {0} کاراکتر وارد کنید.",
+                digits: "فقط عدد وارد کنید."
+
+             },
+            pass: "رمز عبور خود را وارد کنید.",
+            pass_confirm: {
+                required: "تکرار رمز عبور را وارد کنید.",
+                equalTo: "رمز عبور و تکرار آن یکسان نیستند."
+            },
+            user_province: "استان خود را وارد کنید.",
+            user_city: "شهر خود را وارد کنید.",
+            fname: "نام را وارد کنید.",
+            lname: "نام خانوادگی را وارد کنید.",
+            school_name: "نام مرکز آموزشی را وارد کنید.",
+            email: {
+                email: "آدرس ایمیل نامعتبر است."
+            },
+            address: "آدرس مرکز آموزشی را وارد کنید.",
+            phone: {
+                required: "شماره تماس مرکز آموزشی را وارد کنید.",
+                digits: "شماره تماس فقط شامل اعداد میباشد."
+            },
+        }
+    });
+
+    $(".select").select2({
+        placeholder: "انتخاب کنید"
+    });
+    $(".select[name=user_province]").select2({
+        placeholder: "انتخاب کنید"
+    }).on("change", function () {
+        var noptions = "";
+        $.ajax({
+            data: {pid: $(this).select2("val"), _xsrf: '{{ handler.xsrf_token }}'},
+            type: 'post',
+            cache: true,
+            url: '{{ reverse_url("get_cities") }}',
+            async: true,
+            success: function (output3) {
+                if (output3 != '0') {
+                    var first_id = output3['city'][0]['id'];
+                    for (var i in output3['city']) {
+                        noptions += "<option value='" + output3['city'][i]['id'] + "'>" + output3['city'][i]['name'] + "</option>";
+                    }
+                }
+                $(".select[name=user_city]").html(noptions).select2("val", first_id);
+            }, complete: function (output) {
+            }
+        });
+    });
+
+</script>
+{% end block bottom_script %}

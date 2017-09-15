@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>با مدرسه - {{ title }}</title>
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/bootstrap/css/bootstrap-rtl.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/bootstrap/theme/bootstrap-theme.min.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/fonts.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/font-awesome/css/font-awesome.min.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/auth/auth.css') }}">
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/common.css') }}">
+
+    <link rel="shortcut icon" href="{{ static_url('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ static_url('favicon.ico') }}" type="image/x-icon">
+    {% block csses %}
+    {% end other_head body %}
+</head>
+<body>
+
+    <header>
+        <div class="logo text-center">
+            <div class="img img-responsive"></div>
+        </div>
+
+        <div class="_nav">
+            <a href="{{ reverse_url("index") }}">صفحه اصلی</a>
+            <a href="{{ reverse_url("index") }}">راهنما</a>
+            <a href="{{ reverse_url("index") }}">درباره</a>
+        </div>
+
+
+    </header>
+
+
+    <div class="container">
+        <div class="row">
+            {% block container %}
+            {% end block container %}
+        </div>
+    </div>
+
+
+    <footer>کلیه حقوق محفوظ است.</footer>
+
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+
+{% block bottom_script %}
+{% end block bottom_script %}
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+/*author : ReS4*/
+
+._list{
+    padding: 15px;
+}
+._list ._header{
+    background: #d7d7d7;
+    padding: 10px 2px;
+    font-size: 11pt;
+    color: #616161;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+/*._list ._header div{*/
+    /*border-left: solid 1px #a2a2a2;*/
+    /*border-right: solid 1px #dadada;*/
+/*}*/
+/*._list ._header div:first-child{*/
+    /*border-right: none;*/
+/*}*/
+/*._list ._header div:last-child{*/
+    /*border-left: none;*/
+/*}*/
+.select2-results li.select2-result-with-children > .select2-result-label{
+    font-weight: normal;
+    color: #828282;
+    font-size: 12pt;
+}
+._list ._row_g{
+    background: #f1f1f1;
+    padding: 10px 2px;
+    font-size: 10pt;
+    color: #616161;
+    border-radius: 6px;
+    margin-bottom: 3px;
+}
+._list ._row_w{
+    background: #fafafa;
+    padding: 10px 2px;
+    font-size: 10pt;
+    color: #616161;
+    border-radius: 6px;
+    margin-bottom: 3px;
+}
+._list .butt{
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: none;
+    text-align: center;
+    vertical-align: middle;
+    color: white;
+    font-size: 10pt;
+}
+._list .butt i{
+    vertical-align: middle;
+}
+._list .butt:hover i{
+    color: #e9e9e9;
+}
+
+._list .butt.edit{
+    background: #63a0dd;
+}
+._list .butt.delete, ._list .butt.deactive{
+    background: #fa6a1f;
+}
+._list .butt.accept, ._list .butt.active{
+    background: #62b230;
+}
+._list .butt.cancel{
+    background: #a2a2a2;
+}
+
+input[type=checkbox]{
+    margin-top: 11px;
+}
+
+.delete_uploaded_image{
+    top: 10px;
+    position: absolute;
+    left: 10px;
+    color: white;
+    background: red;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    padding-top: 3px;
+    font-size: 10pt;
+    cursor: pointer;
+}
+.delete_uploaded_image:hover{
+    background: #ff8f51;
+}
+
+.delete_uploaded_file{
+    top: 10px;
+    position: absolute;
+    left: 10px;
+    color: white;
+    background: red;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    padding-top: 3px;
+    font-size: 10pt;
+    cursor: pointer;
+}
+.delete_uploaded_file:hover{
+    background: #ff8f51;
+}

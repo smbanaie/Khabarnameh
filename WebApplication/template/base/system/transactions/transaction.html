@@ -1,0 +1,148 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css"
+      href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="colorGreen font-size-14 col-md-12 text-center margin-10-center">{{ m }}</div>
+    {% end if %}
+
+    {% if handler.has_error() %}
+    {% for m in handler.get_errors() %}
+    <div class="colorRed font-size-14 col-md-12 text-center margin-10-center">{{ m }}</div>
+    {% end %}
+    {% end if %}
+</div>
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-4 col-sm-4 col-xs-4">توضیحات</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">مبلغ</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">تاریخ</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">وضعیت</div>
+        </div>
+
+        {% set cnt = 1 %}
+        {% for i in bill %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-4 col-sm-4 col-xs-4 __text">{{ i['description'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-10">{{ abs(i['amount']) }} تومان</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 font-size-8 margin-top-3">{{ i['date'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __butts font-size-10" data-id="{{ i['id'] }}">
+                {% if i['status'] == "new" %}
+                <button class="butt edit font-size-8" data-id="{{ i['id'] }}" data-amount="{{ abs(i['amount']) }}">پرداخت</button>
+                {% else %}
+                <span>پرداخت شده</span>
+                {% end %}
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+    </div>
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+<div class="margin-30-center clearfix"></div>
+
+<div class="col-md-4 col-md-offset-4 col-sm-12 border-top border-bottom display-none" id="show_paybox">
+    <div class="row">
+        <div class="col-md-12 margin-10-center text-center">
+            <div class="font-size-12 margin-5-center" id="_amount"></div>
+            <a href="#" class="display-inline-block width-45-darsad font-size-11 R_butt_green">پرداخت آنلاین</a>
+        </div>
+    </div>
+</div>
+
+<div class="row padding-0 margin-0">
+    <div class="col-lg-12">
+        <h4 class="page-header">تراکنش های انجام شده</h4>
+    </div>
+</div>
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">شماره تراکنش</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">شماره پیگیری</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">مبلغ</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">تاریخ</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">وضعیت</div>
+        </div>
+
+        {% set cnt = 1 %}
+        {% for i in transactions %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __text">{% if i['pid'] %}{{ i['pid'] }}{% else %}-{% end %}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __text">{% if i['tid'] %}{{ i['tid'] }}{% else %}-{% end %}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-10">{{ abs(i['amount']) }} تومان</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 font-size-8 margin-top-3">{{ i['date'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 font-size-10">
+                {% if i['status'] == "success" %}
+                <span class="colorGreen">عملیات موفق</span>
+                {% else %}
+                <span class="colorRed">پرداخت ناموفق</span>
+                {% end %}
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+    </div>
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+
+
+<div class="margin-30-center clearfix"></div>
+
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+<script type="text/javascript">
+    var sp = $("#show_paybox");
+    $(document).on("click", ".butt.edit", function () {
+        sp.slideUp();
+        var _id = $(this).attr("data-id");
+        var _amount = $(this).attr("data-amount");
+
+        $("#show_paybox").find("a").attr("href", "{{ reverse_url("system_prepay_transactions") }}/" + _id);
+        $("#_amount").text("مبلغ قابل پرداخت : " + _amount + " تومان");
+        sp.slideDown();
+    });
+
+</script>
+{% end block bottom_script %}

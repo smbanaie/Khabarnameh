@@ -1,0 +1,131 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}" />
+{% end other_head body %}
+
+{% block container %}
+<div class="col-md-12">
+    <div class="form-horizontal">
+
+        <div class="form-body">
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">نام کاربری :</label>
+
+                <div class="col-md-4">
+                    <input class="form-control" name="username">
+                </div>
+                <div class="col-md-4">
+                    <button class="R_butt_blue _select">انتخاب</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="resBox" class="display-none">
+        <div class="row">
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center">
+                <div id="user_name" class="margin-bottom-10 font-size-11"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1">
+                <div id="jstree_div"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1">
+                <button class="R_butt_blue _save">ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
+            <div class="colorGreen font-size-11 margin-20-center  del_msg display-none"></div>
+        </div>
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-10 col-md-12 text-center">{{ m }}</div>
+        {% end if %}
+    </div>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+
+<script type="text/javascript">
+
+    $(document).on("click", ".R_butt_blue._select", function () {
+        var _id = $("input[name=username]").val();
+
+        $.ajax({
+            url: "{{ url("system_permissions") }}",
+            type: "put",
+            data: {username: _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $("#user_name").text('مجوز های کاربر : ' + resp['user']['first_name'] + ' ' + resp['user']['last_name']);
+                    $('#jstree_div').jstree("destroy").jstree(
+                        {
+                        'core' : {
+                            "multiple" : true,
+                            'data' : JSON.parse(resp['tree'])
+                        },
+                        "plugins" : [ "checkbox" ],
+                        checkbox : {keep_selected_style : false}
+                        }
+                    ).on('loaded.jstree', function() {
+                        $(this).jstree('open_all');
+                    });
+                    $("#resBox").show();
+                }else{
+                    if(resp['error']){
+                        $(".del_msg").text(resp['error']).fadeIn().delay(2000).fadeOut();
+                    }else{
+                        $(".del_msg").text("کاربر مورد نظر یافت نشد.").fadeIn().delay(2000).fadeOut();
+                    }
+                    $("#resBox").delay(3000).hide();
+                }
+            }
+        });
+    });
+
+    $(document).on("click", ".R_butt_blue._save", function () {
+        var checked_ids = [], str;
+        $.each($('#jstree_div').jstree("get_checked", true), function () {
+            checked_ids.push(this.id);
+        });
+        if (checked_ids.length > 0) {
+            str = JSON.stringify(checked_ids);
+        }
+        var _id = $("input[name=username]").val();
+        $.ajax({
+            url: "{{ url("system_permissions") }}",
+            type: "post",
+            data: {permissions: str, username: _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".del_msg").text("اطلاعات با موفقیت ثبت شد.").fadeIn().delay(2000).fadeOut();
+                }else{
+                    $(".del_msg").text("خطا در ثبت اطلاعات. مجدداً تلاش نمایید.").fadeIn().delay(2000).fadeOut();
+                }
+                $("#resBox").delay(3000).hide();
+            }
+        });
+
+    });
+
+</script>
+{% end block bottom_script %}

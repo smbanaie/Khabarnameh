@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+    <title>با مدرسه - {{ title }}</title>
+
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/bootstrap/css/bootstrap-rtl.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/bootstrap/theme/bootstrap-theme.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/fonts.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('plugins/font-awesome/css/font-awesome.min.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/styles.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ static_url('css/common.css') }}">
+
+    {% block csses %}
+    {% end other_head body %}
+</head>
+<body>
+<div class="bd" id="nav_bar">
+
+    <div class="header_logo side_border_b">
+        <a href="/"><div class="logo"></div></a>
+    </div>
+
+    <div class="header_navbar border_b">
+
+        <div class="body_header_nav color1d2939">
+
+            <span class="side_toggler fa fa-reorder"></span>
+
+            <a href="/">خانه</a>
+{#            <a>|</a>#}
+        </div>
+
+
+        <div class="header_user_info pull-right">
+
+            <i class="glyphicon glyphicon-circle-arrow-down colorGray" id="dLabel" data-toggle="dropdown" data-hover="dropdown"></i>
+            <ul class="dropdown-menu custom_dropDown" role="menu" aria-labelledby="dLabel">
+
+
+                <li><a href="{{ reverse_url("dashboard") }}">داشبورد</a></li>
+                <li><a href="/Profile">پروفایل</a></li>
+                <li><a href="/EditProfile">ویرایش اطلاعات</a></li>
+
+                <li><a href="{{ reverse_url("logout") }}">خروج</a></li>
+            </ul>
+
+            <a href="{{ reverse_url("dashboard") }}"><span class="colorGray">{{ user.school_name }}</span></a>
+            <img src="/static/upload/avatars/1" class="img-circle img-thumbnail">
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+<div class="bd" id="side_bar">
+
+    <div class="side side_border_t" style="height: 1000px " >
+        <div style="height: 65px"></div>
+{#        {% block u_sidebar_dashboard %}#}
+{#        <div class="sidebar_back_item">#}
+{#            <a href="/{{ user_id }}/Dashboard"><div class="user_menu_icon ic1"></div><span class="hide_md">داشبورد</span></a>#}
+{#        </div>#}
+{#        {% end block u_sidebar_dashboard %}#}
+
+    </div>
+
+    <div class="main border_t" >
+        <div class="breadcrumb" style="margin-bottom: 0 !important;">
+            {% block breadcrumb %}
+            <i class="fa fa-info-circle"></i>
+            <span>داشبورد</span>
+            {% end block breadcrumb %}
+        </div>
+
+        {% block container %}
+        {% end block container %}
+
+    </div>
+
+
+</div>
+{#<script type="text/javascript" src="/static/plugins/select2/select2.min.js"></script>#}
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+
+<script>
+    var hide_sidebar;
+    $(".side_toggler").click(function(){
+
+        $("#side_bar").toggleClass("side_close");
+        $("#nav_bar").toggleClass("side_close");
+    });
+    $(".select").select2({
+        placeholder: "انتخاب کنید"
+    });
+</script>
+{% block bottom_script %}
+{% end block bottom_script %}
+</body>
+
+</html>

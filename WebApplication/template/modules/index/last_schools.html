@@ -1,0 +1,26 @@
+<div class="rBox margin-30-center">
+    <div class="head">آخرین مراکز آموزشی</div>
+    <div class="body padding-0 last_news">
+        {% for i in users %}
+        <div class="row padding-ver-5 padding-hr-15">
+            <div class="col-md-12 _row">
+                <img src="{{ static_url("upload/schools/" + i['pic']) }}" class="img-thumbnail img-responsive" align="right" onerror="this.onerror=null; this.src='{{ static_url("images/index/no_image.png") }}'">
+                <a href="{{ reverse_url("view_school_profile", i['id'], i['name']) }}" class="title">{{ i['name'] }}</a>
+
+                <div class="pub">
+                    <i class="fa fa-location-arrow vertical-middle"></i>
+                    <span>{{ i['province'] }} - {{ i['city'] }}</span>
+                </div>
+                <hr>
+            </div>
+        </div>
+        {% end %}
+
+{#        <div class="row">#}
+{#            <div class="col-md-12 text-right">#}
+{#                <a class="show_more" href="#">مشاهده بیشتر ...</a>#}
+{#            </div>#}
+{#        </div>#}
+
+    </div>
+</div>

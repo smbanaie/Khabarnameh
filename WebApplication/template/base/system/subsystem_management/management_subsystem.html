@@ -1,0 +1,86 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none margin-10-center"></div>
+    <div class="clearfix"></div>
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-4 col-sm-4 col-xs-4">زیر سیستم</div>
+            <div class="col-md-4 col-sm-3 col-xs-3">تاریخ ایجاد زیر سیستم</div>
+            <div class="col-md-3 col-sm-2 col-xs-2">ویرایش</div>
+        </div>
+
+
+        {% set cnt = 1 %}
+        {% for i in data_sub_system %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-4 col-sm-4 col-xs-4 __text font-size-11">{{ i['name'] }}</div>
+            <div class="col-md-4 col-sm-3 col-xs-3 __text font-size-10">{{ i['date'] }}</div>
+            <div class="col-md-3 col-sm-2 col-xs-2 __butts" data-id="{{ i['id'] }}">
+                <a href="{{ url("system_edit_one_subsystem", i['id']) }}" class="butt edit" data-id="{{ i['id'] }}"><i
+                        class="fa fa-pencil"></i></a>
+                {#                <button class="butt accept" data-id="{{ i['id'] }}"><i class="fa fa-eye"></i></button>#}
+                <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        {% set cnt = cnt + 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+
+    </div>
+
+
+</div>
+
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript">
+    $(".select").select2();
+
+    $("[data-toggle=tooltip]").tooltip();
+    $(document).on("click", ".butt.delete", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_show_subsystems") }}",
+            type: "put",
+            data: {"method": "delete", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+</script>
+{% end block bottom_script %}

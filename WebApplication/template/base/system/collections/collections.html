@@ -1,0 +1,204 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+{% if subsystems %}
+<div class="form-horizontal margin-top-10">
+    <div class="form-body">
+        <div class="form-group">
+            <label class="col-md-4 control-label">سیستم :</label>
+
+            <div class="col-md-4">
+                <select class="select" name="subsystem">
+                    {% for i in subsystems %}
+                    <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                    {% end %}
+                </select>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% end %}
+
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+
+    <div class="row">
+        <div class="colorGray margin-10-center font-size-11 col-md-12 del_msg">ابتدا بر روی مجموعه دلخواه راست کلیک کرده
+            و سپس زیرمجموعه ها را ایجاد نمایید.
+        </div>
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-10 col-md-12">{{ m }}</div>
+        {% end if %}
+    </div>
+
+    <div id="jstree_div"></div>
+
+</div>
+
+
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+
+<script type="text/javascript">
+    $(".select").select2();
+    $('#jstree_div').jstree({
+        'core': {
+            "multiple": false,
+            'data': JSON.parse('{% raw js_tree %}')
+        },
+        "plugins": ["contextmenu"],
+        "contextmenu": {
+            "items": function ($node) {
+                return {
+                    user_collection: {
+                        "label": "اعضای مجموعه",
+                        "icon": "fa fa-user",
+                        "action": function (obj) {
+                            document.location = '{{ url("system_collections_action", 'ShowUsers', '') }}' + $node.id
+                        }
+                    },
+                    new: {
+                        "label": "جدید",
+                        "icon": "fa fa-plus",
+                        "action": function (obj) {
+                            document.location = '{{ url("system_collections_action", 'Add', '') }}' + $node.id
+                        }
+                    },
+                    edit: {
+                        "label": "ویرایش",
+                        "icon": "fa fa-pencil",
+                        "action": function (obj) {
+                            document.location = '{{ url("system_collections_action", 'Edit', '') }}' + $node.id
+                        }
+                    },
+                    delete: {
+                        "label": "حذف",
+                        "icon": "fa fa-times",
+                        "action": function (obj) {
+                            if ($('#jstree_div').jstree(true).get_selected().length == 1) {
+                                if (confirm("آیامی خواهید مجموعه " + $node.text + " را برای همیشه حذف نمایید ؟")) {
+                                    $.ajax({
+                                        'data': {
+                                            'id': $node.id,
+                                            'method': 'delete',
+                                            _xsrf: '{{ handler.xsrf_token }}'
+                                        },
+                                        'type': 'post',
+                                        'url': "{{ url('system_collections_action', 'Delete', '') }}",
+                                        'success': function (response) {
+                                            if (response['status']) {
+                                                location.reload(true);
+                                            } else {
+                                                alert("متاسفانه عملیات با مشکل مواجه شده است!");
+                                            }
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+        }
+    }).on('loaded.jstree', function () {
+        $(this).jstree('open_all');
+    });
+    $(".select[name=subsystem]").select2({}).on("change", function () {
+        {#        alert($(this).select2("val"));#}
+        $.ajax({
+            data: {pid: $(this).select2("val"), _xsrf: '{{ handler.xsrf_token }}'},
+            type: 'post',
+            cache: true,
+            url: '{{ reverse_url("system_collections") }}',
+            async: true,
+            success: function (output3) {
+                if (output3['status']) {
+                    $('#jstree_div').jstree('destroy');
+                    $('#jstree_div').jstree({
+                        'core': {
+                            "multiple": false,
+                            'data': JSON.parse(output3['js_tree'])
+                        },
+                        "plugins": ["contextmenu"],
+                        "contextmenu": {
+                            "items": function ($node) {
+                                return {
+                                    user_collection: {
+                                        "label": "اعضای مجموعه",
+                                        "icon": "fa fa-user",
+                                        "action": function (obj) {
+                                            document.location = '{{ url("system_collections_action", 'ShowUsers', '') }}' + $node.id
+                                        }
+                                    },
+                                    new: {
+                                        "label": "جدید",
+                                        "icon": "fa fa-plus",
+                                        "action": function (obj) {
+                                            document.location = '{{ url("system_collections_action", 'Add', '') }}' + $node.id
+                                        }
+                                    },
+                                    edit: {
+                                        "label": "ویرایش",
+                                        "icon": "fa fa-pencil",
+                                        "action": function (obj) {
+                                            document.location = '{{ url("system_collections_action", 'Edit', '') }}' + $node.id
+                                        }
+                                    },
+                                    delete: {
+                                        "label": "حذف",
+                                        "icon": "fa fa-times",
+                                        "action": function (obj) {
+                                            if ($('#jstree_div').jstree(true).get_selected().length == 1) {
+                                                if (confirm("آیامی خواهید مجموعه " + $node.text + " را برای همیشه حذف نمایید ؟")) {
+                                                    $.ajax({
+                                                        'data': {
+                                                            'id': $node.id,
+                                                            'method': 'delete',
+                                                            _xsrf: '{{ handler.xsrf_token }}'
+                                                        },
+                                                        'type': 'post',
+                                                        'url': "{{ url('system_collections_action', 'Delete', '') }}",
+                                                        'success': function (response) {
+                                                            if (response['status']) {
+                                                                location.reload(true);
+                                                            } else {
+                                                                alert("متاسفانه عملیات با مشکل مواجه شده است!");
+                                                            }
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                        }
+                    }).on('loaded.jstree', function () {
+                        $(this).jstree('open_all');
+                    });
+                } else {
+                    $(".del_msg").text("خطا در عملکرد ، لطفا مجددا تلاش نمایید.").fadeIn().delay(2000).fadeOut();
+                }
+            }, complete: function (output) {
+            }
+        });
+    });
+</script>
+
+{% end block bottom_script %}

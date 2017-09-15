@@ -1,0 +1,204 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/messages/messages.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<form action="{{ reverse_url("system_poll_insert") }}" method="post" enctype="multipart/form-data">
+
+    <div class="form-horizontal">
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+        {% end if %}
+
+        {% if handler.has_error() %}
+        {% for m in handler.get_errors() %}
+        <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end %}
+        {% end if %}
+
+        <div class="col-md-10 col-md-offset-1 col-sm-12">
+
+            <div class="form-group margin-top-15">
+                {#                <label class="col-md-2 control-label">عنوان پیام :</label>#}
+                {##}
+                {#                <div class="col-md-10">#}
+                {#                    <input name="title" placeholder="عنوان پیام را وارد کنید." class="form-control">#}
+                {#                </div>#}
+            </div>
+        </div>
+
+        <div class="col-md-10 col-md-offset-1 col-sm-12">
+            <div class="row">
+
+                <div class="col-md-6 col-sm-12">
+                    <div class="pnl_box">
+                        <div class="head font-size-12">متن نظرسنجی :</div>
+                        <textarea name="text" class="body" placeholder="متن نظرسنجی را وارد کنید."></textarea>
+                    </div>
+                    <div class="clearfix"></div>
+                    {% if subsystems %}
+                    <div class="form-group _school">
+                        <label class="col-md-3 control-label">زیر سیستم ها :</label>
+                        <div class="col-md-5">
+                            <div id="jstree_div" class="margin-top-6"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="subsystems">
+                    {% end %}
+
+                    <div class="col-md-10 form-group margin-top-15">
+                        <label class="control-label">بعدا فعال  شود.</label>
+
+                        <div class="col-md-2 margin-top-7">
+                            <input type="checkbox" name="status_poll">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-horizontal">
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">گزینه ها :</label>
+
+                                <div class="col-md-8">
+                                    <input class="form-control" name="item">
+
+                                    <div class="New"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-4 control-label">افزودن گزینه :</div>
+                        <div class="col-md-8">
+                            <span class="R_butt_green _select fa fa-plus"></span>
+                            <span class="R_butt_red _delete fa fa-minus"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="row margin-0">
+            <div class="form-actions fluid ">
+                <div class="col-md-12 text-center margin-10-center">
+                    <button type="submit" class="R_butt_blue">ثبت نظرسنجی</button>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="receivers" value="[]">
+        {% module xsrf_form_html() %}
+
+        <div class="margin-30-center clearfix"></div>
+    </div>
+</form>
+
+
+{% end block container %}
+
+
+{% block bottom_script %}
+{#<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>#}
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+
+<script type="text/javascript">
+    {% if subsystems %}
+$('#jstree_div').jstree({ 'core': {
+                "multiple": true,
+    'data': JSON.parse('{% raw js_tree %}')
+            },
+            "plugins": ["checkbox"],
+            checkbox: {keep_selected_style: false}
+        }
+    ).on('loaded.jstree', function() {
+        $(this).jstree('open_all');
+   });
+
+    var _frm = $("form");
+    _frm.on("submit", function (e) {
+        var checked_ids = [], str = null;
+        $.each($('#jstree_div').jstree("get_checked", true), function () {
+            checked_ids.push(this.id);
+
+        });
+        if (checked_ids.length > 0) {
+            str = JSON.stringify(checked_ids);
+            $("input[name=subsystems]").val(str);
+        }
+{#        alert(str)#}
+
+        if (str == null) {
+            alert("سیستم مورد نظر را انتخاب کنید.");
+            e.preventDefault();
+            return false;
+        }
+ });
+
+    {% end %}
+
+    var count = 1;
+    $('._select').click(function () {
+        if (count < 10) {
+            count += 1;
+            var html = '<input class="form-control margin-top-6 " id="_new" name="item">';
+            $('.New').append(html);
+        }
+        else {
+            alert("حداکثر 10 گزینه میتوانید تعریف کنید.");
+        }
+    });
+    $('._delete').click(function () {
+        count -= 1;
+        $('#_new:last-child').remove()
+    });
+
+    $("input").validate({
+        errorClass: "colorOrange",
+        rules: {
+            item: {
+                required: true
+            }
+        },
+        messages: {
+            item: "متن گزینه را وارد کنید."
+        }
+    });
+    $("form").submit(function (e) {
+
+        if ($("input[name=item]").val() == "") {
+            e.preventDefault();
+            alert("گزینه خالی مجاز نیست." +
+                    "-گزینه خالی را پر یا حذف کنید.");
+            return false;
+        }
+        if ($("input").val() == "") {
+            e.preventDefault();
+            alert("گزینه خالی مجاز نیست." +
+                    "-گزینه خالی را پر یا حذف کنید.");
+            return false;
+        }
+        if ($("textarea[name=text]").val() == "") {
+            e.preventDefault();
+            alert("متن نظرسنجی را وارد کنید.");
+            return false;
+        }
+
+    });
+
+</script>
+{% end block bottom_script %}

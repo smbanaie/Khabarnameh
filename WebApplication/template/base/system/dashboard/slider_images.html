@@ -1,0 +1,155 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}" />
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="colorGreen font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    {% end if %}
+
+    {% if handler.has_error() %}
+    {% for m in handler.get_errors() %}
+    <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    {% end %}
+    {% end if %}
+</div>
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-5 col-sm-5 col-xs-5">توضیحات تصویر</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">پیش نمایش عکس</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">حذف</div>
+        </div>
+
+        {% set cnt = 1 %}
+        {% for i in images %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-5 col-sm-5 col-xs-5 __text" data-id="{{ i['id'] }}">{{ i['title'] }}</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 text-center" data-id="{{ i['id'] }}">
+                <img class="img-responsive display-block margin-0-center" style="width: auto; max-height: 100px" src="{{ static_url("upload/slider_pic/" + i['name']) }}" alt="{{ i['title'] }}">
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-3 __butts" data-id="{{ i['id'] }}">
+                <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+    </div>
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+
+<div class="row padding-0 margin-0">
+    <div class="col-lg-12">
+        <h3 class="page-header">افزودن تصویر جدید</h3>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+
+        <div class="col-md-6 col-md-offset-3 col-sm-12">
+            <span>توضیحات تصویر :</span>
+            <input class="form-control" maxlength="35" title="توضیحات تصویر" name="title">
+        </div>
+        <div class="col-md-6 col-md-offset-3 col-sm-12 margin-top-10">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="fileupload fileupload-new text-center" data-provides="fileupload">
+                        <div id="photo_show" class="fileupload-new thumbnail"
+                             style="width: 100%; height: auto;display: none !important;">
+                            <img id="logo_image" class="display-none"
+                                 src="{{ static_url("images/public/school1.png") }}" alt=""/>
+                        </div>
+                        <div class="fileupload-preview fileupload-exists thumbnail img-responsive"></div>
+                        <div>
+                                    <span class="btn backgroundBlue colorWhite btn-file">
+                                    <span class="fileupload-new font-size-11"> انتخاب تصویر</span>
+                                    <span class="fileupload-exists font-size-10"><i class="fa fa-undo"></i> تغییر</span>
+                                    <input name="pic" type="file" class="ejbari default"/>
+                                    </span>
+                            <a href="#" class="btn backgroundRed colorWhite fileupload-exists"
+                               data-dismiss="fileupload"><i class="fa fa-trash-o"></i> حذف</a>
+
+                            <div class="font-size-9 margin-5-center colorGray fileupload-exists">حجم عکس نباید از 500
+                                کیلوبایت بیشتر شود.
+                                <div class="row">
+                                    <div class="col-md-12 margin-top-10">
+                                        <button class="R_butt_green do_save">ثبت اطلاعات</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <input type="hidden" name="method" value="save">
+        {% module xsrf_form_html() %}
+    </form>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+<script type="text/javascript">
+
+    $(document).on("click", ".butt.delete", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_slider_images") }}",
+            type: "put",
+            data: {"id": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+    $("form").submit(function(e){
+        if($("input[name=title]").val() == ""){
+            alert("توضیحات تصویر را وارد کنید.");
+            e.preventDefault();
+            return false;
+        }
+    });
+
+</script>
+{% end block bottom_script %}

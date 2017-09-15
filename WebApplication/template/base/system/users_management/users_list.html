@@ -1,0 +1,460 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="row margin-0">
+        <div class="colorGreen font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    </div>
+    {% end if %}
+
+    {% if subsystems %}
+    <div class="form-horizontal page-header margin-top-10">
+        <div class="form-body">
+            <div class="form-group">
+                <label class="col-md-4 control-label">زیرسیستم :</label>
+
+                <div class="col-md-4">
+                    <select class="select" name="subsystem">
+                        {% for i in subsystems %}
+                        <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                        {% end %}
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% end %}
+
+
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none margin-10-center"></div>
+    <div class="clearfix"></div>
+    {% if search %}
+    <div class="row">
+        {#        <div class="col-md-3 col-sm-3">#}
+        {#            <input class="form-control" name="fn" placeholder="نام">#}
+        {#        </div>#}
+        {#        <div class="col-md-3 col-sm-3">#}
+        {#            <input class="form-control" name="ln" placeholder="نام خانوادگی">#}
+        {#        </div>#}
+        <div class="col-md-3 col-sm-3">
+            <input class="form-control" name="username" placeholder="نام کاربری">
+        </div>
+        <div class="col-md-3 col-sm-3">
+            <select class="select" name="role">
+                <option value="all">تمام گروه های کاربری</option>
+                {% for i in roles %}{% if i['role_name'] != "GUEST" %}
+                <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                {% end %}{% end %}
+            </select>
+        </div>
+        <div class="col-md-2 col-sm-2">
+            <select class="select" name="sort">
+                <option value="asc">صعودی</option>
+                <option value="desc">نزولی</option>
+            </select>
+        </div>
+        <div class="col-md-3 pull-left text-left">
+            <button class="R_butt_green do_search">جستجوی کاربران</button>
+        </div>
+    </div>
+    {% end %}
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-5 col-sm-5 col-xs-5">نام و نام خانوادگی</div>
+            <div class="col-md-4 col-sm-4 col-xs-4">نام کاربری</div>
+            {#            <div class="col-md-2 col-sm-2 col-xs-2">نقش ها</div>#}
+            <div class="col-md-2 col-sm-2 col-xs-2">ویرایش</div>
+        </div>
+
+        <div id="result_container">
+
+            {% set cnt = 1 %}
+            {% for i in users %}
+            <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+                <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+                <div class="col-md-5 col-sm-5 col-xs-5 __text">{{ i['first_name'] + " " + i['last_name'] }}</div>
+                <div class="col-md-4 col-sm-4 col-xs-4 __text">{{ i['username'] }}</div>
+                {#            <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-9">-</div>#}
+                <div class="col-md-2 col-sm-2 col-xs-2 __butts" data-id="{{ i['id'] }}">
+                    <button class="butt edit" data-id="{{ i['id'] }}"><i class="fa fa-pencil"></i></button>
+                    <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            {% set cnt += 1 %}
+            {% end %}
+
+            {% if cnt == 1 %}
+            <div class="row _row_w text-center">
+                <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+            </div>
+            {% end %}
+
+
+        </div>
+        <div class="row _loading display-none" id="page_loader">
+            <div class="col-md-12 margin-top-30">
+                <div class="loading display-block"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="margin-30-center clearfix"></div>
+
+    <div class="modal fade in" id="edit_user" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog width-35-darsad">
+            <div class="modal-content border-radius-7">
+                <div class="modal_header">
+                    <span>ویرایش کاربر</span>
+                    <span class="pull-left fa fa-times cursor-pointer" data-dismiss="modal" aria-hidden="true"></span>
+                </div>
+                <div class="modal_body">
+                    <div class="row margin-10-center">
+
+                        <div class="row _loading display-none" id="modal_loader">
+                            <div class="col-md-12 margin-30-center">
+                                <div class="loading display-block"></div>
+                            </div>
+                        </div>
+                        <div id="modal_content" class="display-none">
+                            <div class="col-md-12 text-center">لطفاً اطلاعات کاربر مورد نظر را جهت ویرایش وارد کنید.
+                            </div>
+
+                            <div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2 margin-top-10">
+                                <div class="col-md-12">
+                                    <span>نام :</span>
+                                    <input class="form-control" name="edit_fn" placeholder="نام">
+                                </div>
+                                <div class="col-md-12 margin-top-10">
+                                    <span>نام خانوادگی :</span>
+                                    <input class="form-control" name="edit_ln" placeholder="نام خانوادگی">
+                                </div>
+                                <div class="col-md-12 margin-top-10">
+                                    <span>نام کاربری :</span>
+                                    <input class="form-control" name="edit_username" placeholder="نام کاربری">
+                                </div>
+                                <div class="col-md-12 margin-top-10">
+                                    <span>رمز عبور :</span>
+                                    <input class="form-control" name="edit_pass" type="password" title="پسورد">
+                                </div>
+                                <div class="col-md-12 margin-top-10">
+                                    <span>تکرار رمز عبور :</span>
+                                    <input class="form-control" name="edit_cpass" type="password" title="پسورد">
+                                </div>
+
+                            </div>
+                            <div class="col-md-12 text-center font-size-9 colorb5b5b5 margin-top-5">در صورتی که مایل به
+                                تغییر رمز عبور نیستید ، فیلد رمز و تکرار آن را خالی بگذارید.
+                            </div>
+                            <div class="col-md-12 text-center margin-top-10">
+                                <button class="R_butt_blue do_edit" data-id="0">ثبت اطلاعات</button>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div id="modal_error" class="display-none colorRed margin-10-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+
+<script type="text/html" id="__rows">
+    <div class="row <%= row_color %> text-center" data-id="<%= id %>">
+        <div class="col-md-1 col-sm-1 col-xs-1"><%= cnt %></div>
+        <div class="col-md-5 col-sm-5 col-xs-5 __text"><%= name %></div>
+        <div class="col-md-4 col-sm-4 col-xs-4 __text"><%= uname %></div>
+        <div class="col-md-2 col-sm-2 col-xs-2 __butts" data-id="<%= id %>">
+            <button class="butt edit" data-id="<%= id %>"><i class="fa fa-pencil"></i></button>
+            <button class="butt delete" data-id="<%= id %>"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var modal_loading = $("#modal_loader");
+    var modal_content = $("#modal_content");
+    var modal_error = $("#modal_error");
+
+    $(document).on('click', '.butt.delete', function () {
+        if (confirm("آیا مطمئن هستید ؟ این عملیات غیر قابل بازگشت است.")) {
+            var _id = $(this).attr("data-id");
+            $.ajax({
+                data: {
+                    user: _id,
+                    sys_id: $("select[name=subsystem]").val(),
+                    _xsrf: '{{ handler.xsrf_token }}',
+                    method: "delete"
+                },
+                type: 'put',
+                url: '{{ reverse_url('system_um_users_list') }}',
+                success: function (data) {
+                    if (data['status']) {
+                        alert("کاربر مورد نظر با موفقیت حذف شد.");
+                        $(".row[data-id=" + _id + "]").slideUp();
+                    } else {
+                        alert("خطا در حذف کاربر. مجدداً تلاش کنید.");
+                    }
+                }
+            });
+        }
+
+    });
+
+    $(document).on('click', '.butt.edit', function () {
+        modal_content.hide();
+
+        $("input[name=edit_pass]").val("");
+        $("input[name=edit_cpass]").val("");
+
+        var _id = $(this).attr("data-id");
+        $(".do_edit").attr("data-id", _id);
+        $('#edit_user').modal('show');
+
+        modal_loading.fadeIn();
+        modal_error.hide();
+
+        $.ajax({
+            data: {
+                user: _id,
+                sys_id: $("select[name=subsystem]").val(),
+                _xsrf: '{{ handler.xsrf_token }}',
+                method: "get"
+            },
+            type: 'put',
+            url: '{{ reverse_url('system_um_users_list') }}',
+            success: function (data) {
+                if (data['status']) {
+                    $("input[name=edit_fn]").val(data['data']['first_name']);
+                    $("input[name=edit_ln]").val(data['data']['last_name']);
+                    $("input[name=edit_username]").val(data['data']['name']);
+                    modal_loading.hide();
+                    modal_content.fadeIn();
+                } else {
+                    modal_loading.hide();
+                    modal_content.hide();
+                    modal_error.removeClass("colorGreen").addClass("colorRed").text("کاربر مورد نظر یافت نشد.").show();
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.do_edit', function () {
+        var _id = $(this).attr("data-id");
+        var dt = {
+            user: _id,
+            sys_id: $("select[name=subsystem]").val(),
+            _xsrf: '{{ handler.xsrf_token }}',
+            method: "save"
+        };
+        dt['fn'] = $("input[name=edit_fn]").val();
+        dt['ln'] = $("input[name=edit_ln]").val();
+        dt['username'] = $("input[name=edit_username]").val();
+        dt['pass'] = $("input[name=edit_pass]").val();
+        dt['cpass'] = $("input[name=edit_cpass]").val();
+
+        $.ajax({
+            data: dt,
+            type: 'put',
+            url: '{{ reverse_url('system_um_users_list') }}',
+            success: function (data) {
+                if (data['status']) {
+                    modal_error.removeClass("colorRed").addClass("colorGreen").html("اطلاعات با موفقیت ثبت شد.").fadeIn().delay(3000).fadeOut();
+                } else {
+                    modal_loading.hide();
+                    if (data['errors']) {
+                        var j = "";
+                        for (var i in data['errors']) {
+                            j += data['errors'][i] + "<br>";
+                        }
+                        modal_error.removeClass("colorGreen").addClass("colorRed").html(j).fadeIn();
+                    }
+                }
+            }
+        });
+    });
+
+    {% if search %}
+
+    $(".select").select2();
+    var glob_input = {_xsrf: '{{ handler.xsrf_token }}', page: 1};
+
+    $(".do_search").click(function () {
+        glob_input['fn'] = $("input[name=fn]").val();
+        glob_input['ln'] = $("input[name=ln]").val();
+        glob_input['username'] = $("input[name=username]").val();
+        glob_input['role'] = $("select[name=role]").val();
+        glob_input['sort'] = $("select[name=sort]").val();
+        glob_input['subsystem'] = $("select[name=subsystem]").val();
+        glob_input['page'] = 1;
+
+        var j = "";
+        var cnt = 1;
+
+        page = 1;
+        is_loading = false;
+        is_any_more = true;
+
+        $.ajax({
+            data: glob_input,
+            type: 'post',
+            url: '{{ reverse_url('system_um_users_list') }}',
+            success: function (data) {
+                if (data['status']) {
+                    for (var i in data['data']) {
+                        j += _.template($("#__rows").html())(
+                                {
+                                    id: data['data'][i]['id'],
+                                    name: data['data'][i]['first_name'] + " " + data['data'][i]['last_name'],
+                                    row_color: (cnt % 2) ? "_row_g" : "_row_w",
+                                    cnt: cnt,
+                                    uname: data['data'][i]['username']
+                                }
+                        );
+                        cnt++;
+                    }
+                    $("#result_container").html(j);
+                    if (!data['more']) {
+                        is_any_more = false;
+                    }
+
+                } else {
+                    is_any_more = false;
+                    $("#result_container").html('<div class="row _row_w text-center"> <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div> </div>');
+
+                }
+            }
+        });
+    });
+
+    var loading = $("#page_loader");
+
+    var page = 1;
+    var is_loading = false;
+    var is_any_more = true;
+
+    $(window).scroll(function () {
+
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+            if (is_any_more && is_loading == false) //there's more data to load
+            {
+                glob_input['subsystem'] = $("select[name=subsystem]").val();
+                glob_input['page']++;
+                is_loading = true;
+                loading.show();
+                {#                res.hide();#}
+                $.ajax({
+                    type: 'post',
+                    data: glob_input,
+                    url: '{{ reverse_url('system_um_users_list') }}',
+                    success: function (data) {
+                        var j = "";
+                        var cnt = ((glob_input['page'] - 1) * 15) + 1;
+                        if (data['status']) {
+                            if (data['data']) {
+                                for (var i in data['data']) {
+                                    j += _.template($("#__rows").html())(
+                                            {
+                                                id: data['data'][i]['id'],
+                                                name: data['data'][i]['first_name'] + " " + data['data'][i]['last_name'],
+                                                row_color: (cnt % 2) ? "_row_g" : "_row_w",
+                                                cnt: cnt,
+                                                uname: data['data'][i]['username']
+                                            }
+                                    );
+                                    cnt++;
+                                }
+                                $("#result_container").append(j);
+                            } else {
+                                is_any_more = false;
+                            }
+                        }
+
+                        if (!data['more']) {
+                            is_any_more = false;
+                        }
+                        {#                        res.show();#}
+                        {#                        re_height();#}
+                        loading.hide();
+                        is_loading = false;
+                    }
+                });
+
+            }
+        }
+    });
+
+
+    $(".select[name=subsystem]").select2({}).on("change", function () {
+        page = 1;
+        glob_input['page'] = 1;
+        is_loading = false;
+        is_any_more = true;
+
+        var noptions = "";
+        $.ajax({
+            data: {pid: $(this).select2("val"), _xsrf: '{{ handler.xsrf_token }}'},
+            type: 'post',
+            cache: true,
+            url: '{{ reverse_url("get_roles") }}',
+            async: true,
+            success: function (output3) {
+                if (output3['status']) {
+                    var first_id = output3['sys_roles'][0]['id'];
+                    for (var i in output3['sys_roles']) {
+                        noptions += "<option value='" + output3['sys_roles'][i]['id'] + "'>" + output3['sys_roles'][i]['name'] + "</option>";
+                    }
+                    $(".select[name=role]").html(noptions).select2("val", first_id);
+                    var j = "";
+                    var cnt = 1;
+                    for (var i in output3['sys_users']) {
+                        j += _.template($("#__rows").html())(
+                                {
+                                    id: output3['sys_users'][i]['id'],
+                                    name: output3['sys_users'][i]['first_name'] + " " + output3['sys_users'][i]['last_name'],
+                                    row_color: (cnt % 2) ? "_row_g" : "_row_w",
+                                    cnt: cnt,
+                                    uname: output3['sys_users'][i]['username']
+                                }
+                        );
+                        cnt++;
+                    }
+
+                    $("#result_container").html(j);
+
+                } else {
+                    $(".del_msg").text("خطا در عملکرد ، لطفا مجددا تلاش نمایید.").fadeIn().delay(2000).fadeOut();
+                }
+            }, complete: function (output) {
+            }
+        });
+    });
+    {% end %}
+
+
+</script>
+{% end block bottom_script %}

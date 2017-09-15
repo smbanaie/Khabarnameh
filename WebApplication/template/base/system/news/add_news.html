@@ -1,0 +1,456 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}"/>
+<link rel="stylesheet" type="text/css"
+      href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/bootstrap-tagsinput/bootstrap-tagsinput.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+{% if have_collection %}
+<form action="" method="post" enctype="multipart/form-data">
+    {% end %}
+
+    <div class="form-horizontal">
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+        {% end if %}
+
+        {% if handler.has_error() %}
+        {% for m in handler.get_errors() %}
+        <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end %}
+        {% end if %}
+
+        <div class="col-md-10 col-md-offset-1 col-sm-12 Yekan">
+
+            <div class="form-group">
+                <label class="col-md-1 control-label">عنوان :</label>
+
+                <div class="col-md-11">
+                    <input name="news_title" placeholder="عنوان را وارد کنید." class="form-control" required="required">
+                </div>
+            </div>
+
+            <textarea name="full_text" class="Yekan" title="متن اصلی"></textarea>
+        </div>
+
+        <div class="margin-20-center clearfix"></div>
+
+        <div class="row padding-0 margin-0">
+            <div class="col-lg-12">
+                <h4 class="page-header">مدیریت تصاویر خبر</h4>
+            </div>
+        </div>
+
+        <div id="images_container">
+
+        </div>
+        <div class="clearfix"></div>
+        <hr class="margin-10-center display-block width-40-darsad margin-0-center">
+        <div class="col-md-12 col-sm-12 text-center">
+            <span class="R_butt_green font-size-11 add_new_image">افزودن تصویر</span>
+        </div>
+
+        <div class="margin-20-center clearfix"></div>
+
+        <div class="row padding-0 margin-0">
+            <div class="col-lg-12">
+                <h4 class="page-header">مدیریت فایل های خبر
+                    <small>(
+                        اجازه افزودن فایل هایی با پسوند:
+                        '.mp3','.amr','.wma','.mp4','.3gp','.pdf','doc','.docx','.pptx','.zip'
+                        )
+                    </small>
+                </h4>
+
+            </div>
+        </div>
+
+        <div id="files_container">
+
+        </div>
+        <div class="clearfix"></div>
+        <hr class="margin-10-center display-block width-40-darsad margin-0-center">
+        <div class="col-md-12 col-sm-12 text-center">
+            <span class="R_butt_green font-size-11 add_new_file">افزودن فایل</span>
+        </div>
+
+
+        <div class="margin-20-center clearfix"></div>
+
+        <div class="row padding-0 margin-0">
+            <div class="col-lg-12">
+                <h4 class="page-header">
+                    مدیریت لینک های خبر
+                </h4>
+            </div>
+        </div>
+
+        <div id="links_container">
+
+        </div>
+        <div class="clearfix"></div>
+        <hr class="margin-10-center display-block width-40-darsad margin-0-center">
+        <div class="col-md-12 col-sm-12 text-center">
+            <span class="R_butt_green font-size-11 add_new_link">افزودن لینک</span>
+        </div>
+
+        <div class="row padding-0 margin-0">
+            <div class="col-lg-12">
+                <h4 class="page-header">کلیدواژه های خبر</h4>
+            </div>
+        </div>
+
+        <div class="col-md-10 col-md-offset-1 col-sm-12">
+            <input value="" placeholder="کلید واژه ها را وارد کنید." name="tags">
+        </div>
+
+
+        <div class="row padding-0 margin-0">
+            <div class="col-lg-12">
+                <h4 class="page-header">تنظیمات خبر</h4>
+            </div>
+        </div>
+
+        <div class="col-md-8 col-md-offset-2 col-sm-12">
+
+            <div class="form-body">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">نوع متن :</label>
+
+                    <div class="col-md-5">
+                        <select class="select" required="required" name="_type">
+                            <option value="">انتخاب کنید.</option>
+                            <option value="1">خبر</option>
+                            <option value="2">خبر فوری</option>
+                            <option value="3">خبر مهم</option>
+                            <option value="4">اطلاعیه</option>
+                            <option value="5">برگزیده</option>
+                            <option value="6">گالری عکس</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group _coll">
+                    <label class="col-md-4 control-label">مجموعه :</label>
+
+                    {% if have_collection %}
+                    <div class="col-md-5">
+                        <div id="jstree_div" class="margin-top-6"></div>
+                    </div>
+                    {% else %}
+                    <div class="col-md-8 margin-top-7">
+                        <span>متاسفانه شما اجازه دسترسی به هیچ مجموعه ای ندارید.</span>
+                    </div>
+                    {% end %}
+
+                </div>
+
+            </div>
+            <div class="imgs"></div>
+
+            <div class="form-group display-none">
+                <label class="col-md-4 control-label">نمایش عمومی :</label>
+
+                <div class="col-md-5">
+                    <input type="checkbox" checked name="public" title="نمایش عمومی">
+                </div>
+            </div>
+
+        </div>
+
+        {% if handler.has_error() %}
+        {% for m in handler.get_errors() %}
+        <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end %}
+        {% end if %}
+
+        {% if have_collection %}
+        <div class="form-actions fluid">
+            <div class="col-md-12 text-center">
+                <button type="submit" class="R_butt_blue">ثبت خبر</button>
+            </div>
+        </div>
+        {% end %}
+
+        <input type="hidden" name="method" value="save">
+        <input type="hidden" name="collections" value="">
+        {% module xsrf_form_html() %}
+
+
+        <div class="margin-30-center clearfix"></div>
+    </div>
+
+    {% if have_collection %}
+</form>
+{% end %}
+
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/tinymce/tinymce.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+{#<script type="text/javascript" src="{{ static_url('plugins/typeahead/typeahead.min.js') }}"></script>#}
+<script type="text/javascript"
+        src="{{ static_url('plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+
+<script type="text/html" id="__rows">
+    <div class="col-md-3 col-sm-6 img_row" data-id="<%= id %>">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="fileupload fileupload-new text-center" data-provides="fileupload">
+                    <div id="photo_show" class="fileupload-new thumbnail"
+                         style="width: 100%; max-height: 150px;display: none !important;">
+                        <img id="logo_image" class="display-none" src="{{ static_url("images/public/school1.png") }}"
+                             alt=""/>
+                    </div>
+                    <div class="fileupload-preview fileupload-exists thumbnail img-responsive"
+                         style="max-height: 150px !important;"></div>
+                    <div>
+                                <span class="btn backgroundBlue colorWhite btn-file">
+                                <span class="fileupload-new font-size-11"> انتخاب تصویر</span>
+                                <span class="fileupload-exists font-size-10"><i class="fa fa-undo"></i> تغییر</span>
+                                <input name="pic" type="file" class="ejbari default"/>
+                                </span>
+                        <a href="#" class="btn backgroundRed colorWhite fileupload-exists" data-dismiss="fileupload"
+                           data-id="<%= id %>"><i class="fa fa-trash-o"></i> حذف</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</script>
+
+<script type="text/html" id="__rows_file">
+    <div class="col-md-3 col-sm-6 file_row" data-id="<%= id %>">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="fileupload fileupload-new text-center" data-provides="fileupload">
+                    {#                    <div id="photo_show" class="fileupload-preview fileupload-exists thumbnail img-responsive" style="width: 100%; max-height: 150px;display: none !important;">#}
+                    {#                        #}
+                    {#                    </div>#}
+                    <div class="fileupload-preview fileupload-exists thumbnail img-responsive"
+                         style="max-height: 150px !important;">
+                        <img id="logo_image" src="{{ static_url("images/public/file_upload.png") }}" alt=""/>
+                    </div>
+                    <div>
+                        <div class="margin-0-center margin-bottom-5 width-60-darsad">
+                            <input type="text" class="fileupload-exists form-control" name="file_name"
+                                   placeholder="نام فایل را وارد کنید...">
+                        </div>
+                        <span class="btn backgroundBlue colorWhite btn-file">
+                            <span class="fileupload-new font-size-11"> انتخاب فایل </span>
+                            <span class="fileupload-exists font-size-10"><i class="fa fa-undo"></i> تغییر</span>
+                            <input name="attach_file" type="file" class="ejbari default"/>
+                        </span>
+                        <a href="#" class="btn backgroundRed backgroundRed_file colorWhite fileupload-exists"
+                           data-dismiss="fileupload" data-id="<%= id %>"><i class="fa fa-trash-o"></i> حذف</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</script>
+
+
+<script type="text/html" id="__rows_link">
+    <div class="col-md-12 col-sm-12" data-id="<%= id %>">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">نام لینک :</label>
+
+                    <div class="col-md-8">
+                        <input name="link_name" placeholder="عنوان لینک را وارد کنید" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> لینک :</label>
+
+                    <div class="col-md-8">
+                        <input type="url" name="link_address"
+                               placeholder="آدرس لینک را وارد کنید.به عنوان نمونه : http://test.ir"
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="random_id" value="<%= id %>">
+    </div>
+    <hr class="margin-10-center width-40-darsad margin-0-center">
+</script>
+
+<script type="text/javascript">
+
+    $(".add_new_file").click(function () {
+        var j = _.template($("#__rows_file").html())(
+                {
+                    id: Math.random() * (99999999999999999) - 8888800
+                }
+        );
+
+        $("#files_container").append(j);
+    });
+
+    $(".add_new_link").click(function () {
+        var j = _.template($("#__rows_link").html())(
+                {
+                    id: Math.random() * (99999999999999999) - 8888800
+                }
+        );
+
+        $("#links_container").append(j);
+    });
+
+    $(document).on("click", ".btn.backgroundRed_file", function () {
+        $(".file_row[data-id=" + $(this).attr("data-id") + "]").remove();
+    });
+    $("input[name=attach_file]").change(function () {
+        readURL(this);
+    });
+
+    $(".add_new_image").click(function () {
+        var j = _.template($("#__rows").html())(
+                {
+                    id: Math.random() * (99999999999999999) - 8888800
+                }
+        );
+
+        $("#images_container").append(j);
+    });
+    $(document).on("click", ".btn.backgroundRed", function () {
+        $(".img_row[data-id=" + $(this).attr("data-id") + "]").remove();
+    });
+
+    tinymce.init({
+        selector: "textarea[name=full_text]",
+        menubar: false,
+        toolbar_items_size: 'small',
+        theme: "modern",
+        height: 200,
+        plugins: [
+            "advlist autolink link lists charmap preview hr anchor pagebreak",
+            "searchreplace wordcount visualblocks visualchars nonbreaking",
+            "save table contextmenu directionality emoticons template paste textcolor"
+        ],
+        language: 'fa',
+        directionality: 'rtl',
+        content_css: "{{ static_url('plugins/tinymce/css/content.css') }}",
+        font_formats: "Yekan=Yekan; Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n",
+
+        toolbar1: "fullpage | undo redo | bold italic underline strikethrough | ltr rtl | alignleft aligncenter alignright alignjustify | fontselect fontsizeselect",
+        toolbar2: "cut copy paste | searchreplace | outdent indent  link unlink anchor  | preview | forecolor backcolor | table | hr removeformat | emoticons | fullscreen | visualblocks restoredraft",
+
+        style_formats: [
+            {title: 'Bold text', inline: 'b'},
+            {title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},
+            {title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},
+            {title: 'Example 1', inline: 'span', classes: 'example1'},
+            {title: 'Example 2', inline: 'span', classes: 'example2'},
+            {title: 'Table styles'},
+            {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
+        ]
+    });
+
+    {#    function readURL(input) {#}
+    {##}
+    {#        if (input.files && input.files[0]) {#}
+    {#            var reader = new FileReader();#}
+    {##}
+    {#            reader.onload = function (e) {#}
+    {#                alert(e.target.result);#}
+    {#                $('#blah').attr('src', e.target.result);#}
+    {#            }#}
+    {##}
+    {#            reader.readAsDataURL(input.files[0]);#}
+    {#        }#}
+    {#    }#}
+
+    $("input[name=pic]").change(function () {
+        readURL(this);
+    });
+
+    $(".select").select2({
+        placeholder: "انتخاب کنید"
+    });
+
+    $('#jstree_div').jstree("destroy").jstree(
+            {
+                'core': {
+                    "multiple": true,
+                    'data': JSON.parse('{% raw js_tree %}')
+                },
+                "plugins": ["checkbox"],
+                checkbox: {keep_selected_style: false}
+            }
+    ).on('loaded.jstree', function () {
+                $(this).jstree('open_all');
+            });
+
+    var _frm = $("form");
+    _frm.on("submit", function (e) {
+        var checked_ids = [], str = null;
+        $.each($('#jstree_div').jstree("get_checked", true), function () {
+            checked_ids.push(this.id);
+        });
+        if (checked_ids.length > 0) {
+            str = JSON.stringify(checked_ids);
+            $("input[name=collections]").val(str);
+        }
+        {#        alert(str)#}
+        if (str == null) {
+            alert("مجموعه مورد نظر را انتخاب کنید.");
+            e.preventDefault();
+            return false;
+        }
+
+    }).validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            news_title: "required",
+            _type: "required",
+            full_text: "required"
+        },
+        messages: {
+            news_title: "عنوان پیام را مشخص کنید.",
+            _type: "نوع پیام را مشخص کنید.",
+            full_text: "متن اصلی را وارد کنید."
+
+        }
+    });
+
+    $('input[name=tags]').tagsinput({
+        trimValue: true
+    });
+    {#    $('input[name=audio_file]').tagsinput({#}
+    {#        trimValue: true#}
+    {#    });#}
+
+
+</script>
+{% end block bottom_script %}

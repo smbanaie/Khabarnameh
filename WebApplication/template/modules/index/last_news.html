@@ -1,0 +1,31 @@
+<div class="rBox margin-30-center">
+    <div class="head">آخرین اخبار</div>
+    <div class="body padding-0 last_news">
+        {% for i in news %}
+        <div class="row padding-ver-5 padding-hr-15">
+            <div class="col-md-12 _row">
+                <img src="{{ static_url("upload/schools/" + i['user']['pic']) }}" class="img-thumbnail img-responsive" align="right" onerror="this.onerror=null; this.src='{{ static_url("images/index/no_image.png") }}'">
+                {% if i['type'] == "news" %}
+                <span class="badge backgroundDarkBlue display-inline-block font-size-8">خبر</span>
+                {% else %}
+                <span class="badge backgroundOrange display-inline-block font-size-8">اطلاعیه</span>
+                {% end %}
+                <a href="{{ reverse_url("news_show", i['id']) }}" class="title">{{ i['name'] }}</a>
+
+                <a class="pub" href="{{ reverse_url("view_school_profile", i['user']['id'], i['user']['name']) }}">
+                    <i class="fa fa-rss-square vertical-middle"></i>
+                    <span>{{ i['user']['name'] }}</span>
+                </a>
+                <hr>
+            </div>
+        </div>
+        {% end %}
+
+{#        <div class="row">#}
+{#            <div class="col-md-12 text-right">#}
+{#                <a class="show_more" href="#">مشاهده بیشتر ...</a>#}
+{#            </div>#}
+{#        </div>#}
+
+    </div>
+</div>

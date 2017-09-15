@@ -1,0 +1,205 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="row margin-0">
+        <div class="colorGreen font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    </div>
+    {% end if %}
+
+        {% if subsystems %}
+    <form action="" method="post">
+        <div class="form-horizontal">
+            <div class="form-body">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">زیرسیستم :</label>
+
+                    <div class="col-md-4">
+                        <select class="select" name="subsystem">
+                            {% for i in subsystems %}
+
+{#                            <option  value="{{ i['id'] }}">{{ i['name'] }}</option>#}
+                            <option{% if  sub_id !="all" %} {% if i['id']== int(sub_id) %}selected{% end %}{% end %} value="{{ i['id'] }}">{{ i['name'] }}</option>
+                            {#                        <input type="hidden" name="subsystem_se" value="{{ i['id'] }}">#}
+                            {% end %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="R_butt_blue _select">جستجو</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" value="search" name="search">
+        {% module xsrf_form_html() %}
+    </form>
+    {% end %}
+
+
+
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none margin-10-center"></div>
+    <div class="clearfix"></div>
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-4 col-sm-4 col-xs-4">عنوان خبر</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">تاریخ انتشار</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">نویسنده</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">ویرایش / تایید</div>
+        </div>
+
+        {% if can_view_news %}
+
+        {% set cnt = ((page_number - 1) * 10) + 1 %}
+        {% for i in news %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-4 col-sm-4 col-xs-4 __text">{{ i['title'] }}</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 __text font-size-8">{{ i['date'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-9">{{ i['user']['name'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __butts" data-id="{{ i['id'] }}">
+                <a href="{{ url("system_news_edit", i['id']) }}" class="butt edit" data-id="{{ i['id'] }}"><i class="fa fa-pencil"></i></a>
+                <button class="butt accept" data-id="{{ i['id'] }}"><i class="fa fa-check"></i></button>
+                <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+
+        {% else %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">متاسفانه شما امکان مشاهده اخبار را ندارید.</div>
+        </div>
+        {% end %}
+
+        {% if total_count > 10 %}
+        <nav class="text-center">
+            <ul class="pagination pagination-sm">
+                {% if pagination['prev'] %}
+                <li>
+                    <a href="{{ url("system_news_management_pagination", 1) }}" aria-label="Previous" data-toggle="tooltip" data-placement="top" title="صفحه اول">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% end %}
+                {% set total_page = (total_count//10) + 1 %}
+                {% if  total_page <= 5 %}
+
+                    {% for i in range(1, total_page + 1) %}
+
+                    <li{% if page_number == i %} class="active"{% end %}><a href="{{ url("system_news_management_pagination", i) }}">{{ i }}</a></li>
+                    {% end %}
+
+                {% else %}
+
+                {% if page_number in [1,2,3] %}
+                    {% for i in range(1, 6) %}
+                    <li{% if page_number == i %} class="active"{% end %}><a href="{{ url("system_news_management_pagination", i) }}">{{ i }}</a></li>
+                    {% end %}
+                {% elif page_number in [total_page, total_page - 1,total_page - 2] %}
+                    {% for i in range(total_page - 4, total_page + 1) %}
+                    <li{% if page_number == i %} class="active"{% end %}><a href="{{ url("system_news_management_pagination", i) }}">{{ i }}</a></li>
+                    {% end %}
+                {% else %}
+                    {% for i in range(page_number - 2, page_number + 3) %}
+                    <li{% if page_number == i %} class="active"{% end %}><a href="{{ url("system_news_management_pagination", i) }}">{{ i }}</a></li>
+                    {% end %}
+                {% end %}
+
+                {% if pagination['next'] %}
+                <li>
+                    <a href="{{ url("system_news_management_pagination", total_page) }}" aria-label="Next" data-toggle="tooltip" data-placement="top" title="صفحه آخر">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% end %}
+                {% end %}
+
+
+            </ul>
+        </nav>
+        {% end %}
+
+
+    </div>
+
+
+
+</div>
+
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript">
+    $("[data-toggle=tooltip]").tooltip();
+    $(".select").select2();
+    {% if can_view_news %}
+    $(document).on("click", ".butt.delete", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_news_management") }}",
+            type: "post",
+            data: {"method": "delete", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+
+    $(document).on("click", ".butt.accept", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_news_waiting") }}",
+            type: "post",
+            data: {"method": "accept", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("خبر تایید شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در تایید خبر.مجدد تلاش کنید.").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+    {% end %}
+
+</script>
+{% end block bottom_script %}

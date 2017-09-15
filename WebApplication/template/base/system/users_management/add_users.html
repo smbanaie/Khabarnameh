@@ -1,0 +1,273 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+
+<div class="col-md-12">
+
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
+            <div class="colorGreen font-size-11 margin-20-center  del_msg display-none"></div>
+        </div>
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end if %}
+
+        {% if handler.has_error() %}
+        {% for m in handler.get_errors() %}
+        <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end %}
+        {% end if %}
+    </div>
+    <div class="row">
+        <form action="" id="from_add_user" method="post" enctype="multipart/form-data" class="form-body">
+            <div class="col-md-6">
+                <div class="form-horizontal">
+
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">نام :</label>
+
+                        <div class="col-md-8">
+                            <input class="form-control" autocomplete="off" name="fname" required="required">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">نام خانوادگی :</label>
+
+                        <div class="col-md-8">
+                            <input class="form-control" autocomplete="off" name="lname" required="required">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">نام کاربری :</label>
+
+                        <div class="col-md-8">
+                            <input class="form-control" autocomplete="off" required="required" maxlength="11"
+                                   name="username" type="text" placeholder="شماره موبایل وارد کنید">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">گذرواژه :</label>
+
+                        <div class="col-md-8">
+                            <input class="form-control" autocomplete="off" type="password" required="required"
+                                   name="password"
+                                   id="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">تکرار گذرواژه :</label>
+
+                        <div class="col-md-8">
+                            <input class="form-control" autocomplete="off" type="password" required="required"
+                                   name="conf_password">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">گروه کاربری :</label>
+
+                    {#                <div class="col-md-8">#}
+                    {#                    <select class="select  margin-10-center" name="users_role" title="گروه های کاربری">#}
+                    {#                        {% for i in roles %}#}
+                    {#                        {% if i['role_name'] != "GUEST" %}#}
+                    {#                        <option value="{{ i['id'] }}">{{ i['name'] }}</option>#}
+                    {#                        {% end %}#}
+                    {#                        {% end %}#}
+                    {#                    </select>#}
+                    {#                </div>#}
+                    <div class="col-md-8 col-sm-8">
+                        <div id="jstree_div"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-3 text-center">
+                    <button class="R_butt_blue" type="submit">ذخیره</button>
+                </div>
+            </div>
+
+            <input type="hidden" name="method" value="save">
+            <input type="hidden" name="role" value="[]">
+            {% module xsrf_form_html() %}
+
+        </form>
+    </div>
+
+    <div class="margin-20-center clearfix"></div>
+
+    <div class="row padding-0 margin-0">
+        <div class="col-lg-12">
+            <h3 class="page-header">افزودن گروهی</h3>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2 col-sm-12 text-center">
+        <div>برای ثبت کاربران به صورت گروهی ، ابتدا فایل نمونه زیر را دانلود نموده و پس از تکمیل اطلاعات آنرا بارگزاری
+            نمایید.
+        </div>
+
+        <div class="row margin-0">
+            <div class="col-md-12 margin-10-center">
+                <a class="R_butt_green font-size-10" href="{{ static_url("xlsx/sample.xlsx") }}">دانلود فایل نمونه</a>
+            </div>
+        </div>
+
+        <form action="" method="post" enctype="multipart/form-data">
+            {#            <input type="hidden" name="_xsrf" value="{{ handler.xsrf_token }}">#}
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 ">
+                    <input class="border-top border-bottom display-block width-100-darsad margin-10-center" name="inp"
+                           type="file">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="margin-top-7">گروه کاربری :</div>
+                        </div>
+                        <div class="col-md-8">
+                            <select class="select  margin-10-center" name="users_role" title="گروه های کاربری">
+                                {% for i in roles %}
+                                {% if i['role_name'] != "GUEST" %}
+                                <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                                {% end %}
+                                {% end %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group margin-20-center">
+                <div class="col-md-6 col-md-offset-3 text-center">
+                    <button class="R_butt_blue _save" type="submit">ذخیره</button>
+                </div>
+            </div>
+
+            <input type="hidden" name="method" value="group_save">
+            {% module xsrf_form_html() %}
+        </form>
+    </div>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+
+<script type="text/javascript">
+
+
+    $(".select").select2();
+    jQuery.validator.addMethod("iran_mobiles", function (value, element) {
+        return this.optional(element) || /^(09\d{9})$/.test(value);
+    }, "شماره موبایل یا تلفن صحیح وارد کنید.");
+    var frm = $(".form-body").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            username: {
+                required: true,
+                maxlength: 11,
+                {#                minlength: 11,#}
+                digits: true,
+                iran_mobiles: true
+            },
+            password: "required",
+            conf_password: {
+                equalTo: "#password"
+            },
+            fname: "required",
+            lname: "required"
+        },
+        messages: {
+            username: {
+                required: "نام کاربری را وارد کنید.",
+                iran_mobiles: "شماره موبایل را صحیح وارد کنید.",
+                digits: "شماره موبایل را صحیح وارد کنید.",
+                maxlength: "شماره موبایل را صحیح وارد کنید."
+            },
+            password: "گذرواژه را وارد کنید.",
+            conf_password: {
+                required: "تکرار گذرواژه را وارد کنید.",
+                equalTo: "گذرواژه و تکرار آن یکسان نیستند."
+            },
+            fname: "نام را وارد کنید.",
+            lname: "نام خانوادگی وارد کنید."
+
+        }
+    });
+    $('#jstree_div').jstree("destroy").jstree({
+        'core': {
+            "multiple": true,
+            'data': JSON.parse('{% raw js_tree %}')
+        },
+        "plugins": ["checkbox"]
+    }).on('loaded.jstree', function () {
+        $(this).jstree('open_all');
+    });
+
+
+    $('#from_add_user').submit(function (e) {
+        var checked_ids = [], role;
+        $.each($('#jstree_div').jstree("get_checked", true), function () {
+            checked_ids.push(this.id);
+        });
+
+        if (checked_ids.length > 0) {
+            role = JSON.stringify(checked_ids);
+        }
+
+        if (role) {
+            $("input[name=role]").val(role);
+        } else {
+            e.preventDefault();
+            alert("گروه های کاربری را به درستی انتخاب کنید.");
+            return false;
+        }
+
+    });
+
+    {#    $('#jstree_div').jstree("destroy").jstree(#}
+    {#            {#}
+    {#                'core': {#}
+    {#                    "multiple": tr{#ue,#}
+    {#                    'data': JSON.parse(resp['tree'])#}
+    {##}
+    {#                },#}
+    {#                "plugins": ["checkbox"{#],#}
+    {#                checkbox: {keep_selected_style: fal{#se}#}
+    {#            }#}
+    {#    ).on('loaded.jstree', function ({#) {#}
+    {#                $(this).jstree('open_all{#');#}
+    {#            });#}
+
+</script>
+{% end block bottom_script %}

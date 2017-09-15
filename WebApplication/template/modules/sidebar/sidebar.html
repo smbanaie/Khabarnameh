@@ -1,0 +1,22 @@
+<ul class="nav font-size-11" id="side-menu">
+    {% set cnt = 1 %}
+    {% for i in _tree %}
+    <li data-id="{{ cnt }}">
+        {% if i['child'] %}
+        <a href="{{ i['url'] }}"><i class="fa fa-chevron-circle-left fa-fw vertical-middle"></i> {{ i['title'] }} <span class="fa arrow"></span></a>
+        <ul class="nav nav-second-level font-size-9">
+            {% for j in i['child'] %}
+            <li>
+                <a {% if j['activation'] %}class="active"{% end %} href="{{ j['url'] }}" data-id="{{ cnt }}">{{ j['title'] }}</a>
+            </li>
+            {% end %}
+        </ul>
+        {% else %}
+        <a {% if i['activation'] %}class="active"{% end %} href="{{ i['url'] }}"><i class="fa fa-chevron-circle-left fa-fw vertical-middle"></i> {{ i['title'] }} </a>
+        {% end %}
+    </li>
+    {% set cnt += 1 %}
+    {% end %}
+
+
+</ul>

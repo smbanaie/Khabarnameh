@@ -1,0 +1,250 @@
+{% extends "../main_template.html" %}
+
+{% block csses %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css"
+      href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}"/>
+{% end csses %}
+
+{% block container %}
+<div class="row margin-0">
+    <div class="col-md-8 col-sm-8 col-xs-10 col-md-offset-2 col-sm-offset-2 col-xs-offset-1">
+
+        <div class="row">
+            <div class="col-md-12 padding-0">
+                <div class="register_section">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="box active">
+                            <div class="sp1">1</div>
+                            <div class="sp2">مرحله اول</div>
+                            <div class="fa fa-arrow-left vertical-middle font-size-18 colorGray"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="box active">
+                            <div class="sp1">2</div>
+                            <div class="sp2">اطلاعات تکمیلی</div>
+                            <div class="fa fa-arrow-left vertical-middle font-size-18 colorGray"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="box">
+                            <div class="sp1">3</div>
+                            <div class="sp2">ثبت نهایی !</div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="col-md-10 col-md-offset-1">
+        <div class="row">
+            <div class="rBox signup">
+                <div class="head">تکمیل ثبت نام</div>
+                <div class="body">
+                    {% set m = handler.get_flash('msg') %}
+                    {% if m != None %}
+                    <div class="row">
+                        <div class="colorBlue font-size-11 col-md-12 text-center margin-10-center">{{ m }}</div>
+                    </div>
+                    {% end if %}
+
+                    <form action="{{ reverse_url('plans_order_by_step', plan['id'], "Step3") }}" method="post" enctype="multipart/form-data"
+                          class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-9">
+
+                                <div class="form-body">
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">نام :</label>
+                                        <div class="col-md-6">
+                                            <input class="form-control" required="required" name="fname" type="text">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">نام خانوادگی :</label>
+                                        <div class="col-md-6">
+                                            <input class="form-control" required="required" name="lname" type="text">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"><span class="">ایمیل</span> <span
+                                                class="font-size-8 colorb5b5b5">(اجباری)</span></label>
+
+                                        <div class="col-md-6">
+                                            <input class="form-control" required="required" name="email" type="text">
+                                        </div>
+                                    </div>
+
+                                    <hr class="display-block clearfix width-80-darsad border-bottom">
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">نام مرکز آموزشی :</label>
+
+                                        <div class="col-md-6">
+                                            <input class="form-control" required="required" name="school_name"
+                                                   type="text">
+                                            <span class="help-block">نام را به فارسی وارد کنید.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">شماره تماس :</label>
+
+                                        <div class="col-md-6">
+                                            <input class="form-control" required="required" name="phone" type="text">
+                                            <span class="help-block">جهت تماس و تایید سرویس شما، وارد کردن شماره تماس الزامی است.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">آدرس مرکز آموزشی :</label>
+
+                                        <div class="col-md-8">
+                                    <textarea class="form-control no-resize" required="required"
+                                              name="address"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">مقطع تحصیلی :</label>
+
+                                        <div class="col-md-6">
+                                            <select class="select" required="required" name="level">
+                                                <option value="">انتخاب کنید.</option>
+                                                {% for i in grade %}
+                                                <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                                                {% end %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div>آپلود تصویر :</div>
+
+                                        <div class="fileupload fileupload-new text-center" data-provides="fileupload">
+                                            <div id="photo_show" class="fileupload-new thumbnail"
+                                                 style="width: 100%; height: auto;">
+                                                <img id="logo_image" src="{{ static_url("images/public/school1.png") }}"
+                                                     alt=""/>
+                                            </div>
+                                            <div class="fileupload-preview fileupload-exists thumbnail"
+                                                 style="max-width: 145px;max-height: 100px; line-height: 20px;"></div>
+                                            <div>
+                                        <span class="btn backgroundBlue colorWhite btn-file">
+                                        <span class="fileupload-new font-size-10"><i class="fa fa-paper-clip"></i> انتخاب تصویر </span>
+                                        <span class="fileupload-exists font-size-10"><i
+                                                class="fa fa-undo"></i> تغییر</span>
+                                        <input name="pic" type="file" class="ejbari default"/>
+                                        </span>
+                                                <a href="#" class="btn backgroundRed colorWhite fileupload-exists"
+                                                   data-dismiss="fileupload"><i class="fa fa-trash-o"></i> حذف</a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% module xsrf_form_html() %}
+
+
+                        </div>
+
+                        {% if handler.has_error() %}
+                        {% for m in handler.get_errors() %}
+                        <div class="colorBlue font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+                        {% end %}
+                        {% end if %}
+                        <div class="form-actions fluid">
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="butt">تکمیل ثبت نام !</button>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript"
+        src="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+<script type="text/javascript">
+    jQuery.validator.addMethod("latin_numbers", function (value, element) {
+        return this.optional(element) || /^\w+$/.test(value);
+    }, "Please specify the correct domain for your documents");
+
+    var frm = $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            fname: "required",
+            lname: "required",
+            school_name: "required",
+            email: {
+                required: true,
+                email: true
+            },
+            phone: {
+                required: true,
+                digits: true
+            },
+            address: "required",
+            level: "required"
+        },
+        messages: {
+
+            fname: "نام را وارد کنید.",
+            lname: "نام خانوادگی را وارد کنید.",
+            school_name: "نام مرکز آموزشی را وارد کنید.",
+            email: {
+                required :"آدرس ایمیل  را وارد کنید.",
+                email: "آدرس ایمیل نامعتبر است."
+            },
+            address: "آدرس مرکز آموزشی را وارد کنید.",
+            phone: {
+                required: "شماره تماس مرکز آموزشی را وارد کنید.",
+                digits: "شماره تماس فقط شامل اعداد میباشد."
+            },
+            level: "مقطع تحصیلی مرکز آموزشی را وارد کنید."
+        }
+    });
+
+    $(".select").select2({
+        placeholder: "انتخاب کنید"
+    });
+
+
+</script>
+{% end block bottom_script %}

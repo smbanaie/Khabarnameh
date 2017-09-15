@@ -1,0 +1,205 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/messages/messages.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="row margin-0">
+        <div class="colorGreen font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    </div>
+    {% end if %}
+    {% if subsystems %}
+    <form action="" method="post">
+        <div class="form-horizontal">
+            <div class="form-body">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">زیرسیستم :</label>
+
+                    <div class="col-md-4">
+                        <select class="select" name="subsystem">
+                            {% for i in subsystems %}
+                            <option {% if i['id']== int(sub_id) %}selected{% end %}
+                                    value="{{ i['id'] }}">{{ i['name'] }}</option>
+                            {#                        <input type="hidden" name="subsystem_se" value="{{ i['id'] }}">#}
+                            {% end %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="R_butt_blue _select">جستجو</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" value="search" name="search">
+        {% module xsrf_form_html() %}
+    </form>
+    {% end %}
+
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none margin-10-center"></div>
+    <div class="clearfix"></div>
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-6 col-sm-6 col-xs-6">متن</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">تاریخ</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">نمایش</div>
+        </div>
+
+        <div id="result_container">
+            {% set cnt = 1 %}
+            {% for i in messages %}
+            <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+                <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+                <div class="col-md-6 col-sm-6 col-xs-6__text font-size-8 padding-top-5">
+                    {% if len(i['text'])< 55 %}{{ i['text'] }}{% else %}{{ i['text'][0:55] }}...{% end %}</div>
+                <div class="col-md-3 col-sm-3 col-xs-3 __text font-size-8 padding-top-5">{{ i['date'] }}</div>
+                <div class="col-md-2 col-sm-2 col-xs-2 __butts">
+                    <button class="R_butt_blue do_show font-size-8" data-text="{{ i['text'] }}"
+                            data-id="{{ i['id'] }}">نمایش
+                    </button>
+                </div>
+            </div>
+            {% set cnt += 1 %}
+            {% end %}
+
+            {% if cnt == 1 %}
+            <div class="row _row_w text-center">
+                <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+            </div>
+            {% end %}
+
+        </div>
+    </div>
+</div>
+<div class="modal fade in" id="suggestion_show" tabindex="-1" aria-hidden="false">
+    <div class="col-md-12 col-md-offset-1 margin-top-50">
+        <div class="modal-dialog width-55-darsad">
+            <div class="modal-content border-radius-7">
+                <div class="modal_header">
+                    <span>نمایش پیام</span>
+                    <span class="pull-left fa fa-times cursor-pointer" data-dismiss="modal" aria-hidden="true"></span>
+                </div>
+                <div class="modal_body">
+                    <div class="row margin-10-center">
+                        <div id="show_text_message"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+<script type="text/html" id="__msg_rows">
+
+    <div class="col-md-10 col-sm-12 <%= dir %> __msg_box" data-id="<%= id %>">
+        <div class="display-block">
+            <div class="dt"><%= date %></div>
+            <div class="bt del" data-id="<%= id %>">حذف پیام</div>
+        </div>
+        <div><%= text %></div>
+    </div>
+</script>
+
+<script type="text/html" id="__rows">
+    <div class="row <%= row_color %> text-center" data-id="<%= id %>">
+        <div class="col-md-1 col-sm-1 col-xs-1"><%= cnt %></div>
+        <div class="col-md-6 col-sm-6 col-xs-6 __text"><%= text %></div>
+        <div class="col-md-3 col-sm-3 col-xs-3 __text font-size-8 padding-top-5"><%= date %></div>
+        <div class="col-md-2 col-sm-2 col-xs-2 __butts">
+            <button class="R_butt_blue do_show font-size-8" data-text="<%= text %>" data-id="<%= id %>">نمایش</button>
+        </div>
+    </div>
+
+</script>
+
+<script type="text/javascript">
+    $(".select").select2();
+    $("[data-toggle=tooltip]").tooltip();
+    var modal_loading = $("#modal_loader");
+    var modal_content = $("#modal_content");
+    var modal_error = $("#modal_error");
+    var uid = null;
+    $(document).on('click', '.do_show', function () {
+        modal_content.hide();
+
+        var _id = $(this).attr("data-id");
+        var text = $(this).attr("data-text");
+        $('#show_text_message').html(text);
+        $('#suggestion_show').modal('show');
+
+
+    });
+
+    var glob_input = {_xsrf: '{{ handler.xsrf_token }}', page: 1};
+
+    var loading = $("#page_loader");
+
+    var page = 1;
+    var is_loading = false;
+    var is_any_more = true;
+
+    $(window).scroll(function () {
+
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+            if (is_any_more && is_loading == false) //there's more data to load
+            {
+                glob_input['page']++;
+                is_loading = true;
+                loading.show();
+                $.ajax({
+                    type: 'post',
+                    data: glob_input,
+                    success: function (data) {
+                        var j = "";
+                        var cnt = ((glob_input['page'] - 1) * 15) + 1;
+                        if (data['status']) {
+                            if (data['data']) {
+                                for (var i in data['data']) {
+                                    j += _.template($("#__rows").html())(
+                                            {
+                                                id: data['data'][i]['id'],
+                                                row_color: (cnt % 2) ? "_row_g" : "_row_w",
+                                                cnt: cnt,
+                                                text: data['data'][i]['text'],
+                                                date: data['data'][i]['date']
+                                            }
+                                    );
+                                    cnt++;
+                                }
+                                $("#result_container").append(j);
+                            } else {
+                                is_any_more = false;
+                            }
+                        }
+
+                        if (!data['more']) {
+                            is_any_more = false;
+                        }
+                        loading.hide();
+                        is_loading = false;
+                    }
+                });
+
+            }
+        }
+    });
+
+</script>
+{% end block bottom_script %}

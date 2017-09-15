@@ -1,0 +1,194 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+{% end other_head body %}
+
+{% block container %}
+
+
+{#{% if handler.current_plan_id == 1 %}#}
+<div class="col-md-3 col-sm-12">
+    <div class="panel {% if new_msg %}panel-green{% else %}panel-gray{% end %}">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-xs-3">
+                    <i class="fa fa-envelope fa-4x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                    <div class="huge">{{ new_msg }}</div>
+                    <div>پیام جدید</div>
+                </div>
+            </div>
+        </div>
+        <a href="{{ reverse_url("system_messages_received") }}" class="padding-0">
+            <div class="panel-footer">
+                <span class="pull-right">مشاهده جزئیات</span>
+                <span class="pull-left"><i class="fa fa-arrow-circle-left"></i></span>
+
+                <div class="clearfix"></div>
+            </div>
+        </a>
+    </div>
+</div>
+{#{% end %}#}
+
+<div class="col-md-3 col-sm-12">
+    <div class="panel {% if new_suggestions %}panel-lightRed{% else %}panel-gray{% end %}">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-xs-3">
+                    <i class="fa fa-comments fa-4x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                    <div class="huge">{{ new_suggestions }}</div>
+                    <div>پیشنهادات جدید</div>
+                </div>
+            </div>
+        </div>
+        <a href="{{ reverse_url("system_suggestions") }}" class="padding-0">
+            <div class="panel-footer">
+                <span class="pull-right">مشاهده جزئیات</span>
+                <span class="pull-left"><i class="fa fa-arrow-circle-left"></i></span>
+
+                <div class="clearfix"></div>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="col-md-3 col-sm-12">
+    <div class="panel {% if new_news_comment %}panel-blue{% else %}panel-gray{% end %}">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-xs-3">
+                    <i class="fa fa-comments fa-4x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                    <div class="huge">{{ new_news_comment }}</div>
+                    <div>نظرات خبر جدید</div>
+                </div>
+            </div>
+        </div>
+        <a href="{{ reverse_url("system_comments") }}" class="padding-0">
+            <div class="panel-footer">
+                <span class="pull-right">مشاهده جزئیات</span>
+                <span class="pull-left"><i class="fa fa-arrow-circle-left"></i></span>
+
+                <div class="clearfix"></div>
+            </div>
+        </a>
+    </div>
+</div>
+{#----------------------------------------------------------------------------------------------#}
+<div class="col-md-12 __row margin-bottom-35">
+    <div class="row margin-0">
+        <div class="head_dashboard">آخرین بازدید ها:</div>
+        <div class="col-md-12 border_dashboard">
+            <div class="row  __select font-size-13 colorBlue">
+                <span class="col-md-1 text-center ">ردیف</span>
+                <span class="col-md-4 text-center ">عنوان خبر</span>
+                <span class="col-md-3 text-center">کاربر</span>
+                <span class="col-md-4 text-center"> تاریخ</span>
+            </div>
+            {% set cnt = 1 %}
+            {% for i in last_visit %}
+            <div class="row border-top __select">
+                <span class="col-md-1 text-center ">{{ cnt }}</span>
+                <span class="col-md-4 text-center ">{{ i['news_name'][0:45] }}{% if len(i['news_name'])>45 %}...{% end %} </span>
+                <span class="col-md-3 text-center">{{ i['user_name'] }}</span>
+                <span class="col-md-4 text-center"> {{ i['date'] }}</span>
+            </div>
+            {% set cnt = cnt + 1 %}
+            {% end %}
+            {% if not last_visit %}
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="border-top"></div>
+                </div>
+                <span class="col-md-6 text-center col-md-offset-3 margin-top-20">موردی وجود ندارد.</span>
+            </div>
+            {% end %}
+        </div>
+    </div>
+</div>
+{#----------------------------------------------------------------------------------------------#}
+
+
+{% end block container %}
+
+
+{% block bottom_script %}
+{#<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>#}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+
+<script type="text/javascript">
+    jQuery.validator.addMethod("latin_numbers", function (value, element) {
+        return this.optional(element) || /^\w+$/.test(value);
+    }, "Please specify the correct domain for your documents");
+
+    $(document).on('click', '.R_butt_red.pull-left.font-size-10', function () {
+        {#        if (confirm("آیا مطمئن هستید ؟")) {#}
+        var _id = $(this).attr("data-id");
+        var _visitor_id = $(this).attr("data-visitor");
+        $.ajax({
+            data: {_id: _id, _xsrf: '{{ handler.xsrf_token }}', visitor_id: _visitor_id, method: "no"},
+            type: 'put',
+            url: '{{ reverse_url('system_dashboard') }}',
+            success: function (data) {
+                if (data['status']) {
+                    alert("عملیات مورد نظر با موفقیت انجام شد.");
+                    $(".row[data-id=" + _id + "]").slideUp();
+                } else {
+                    alert("خطا در انجام عملیات. مجدداً تلاش کنید.");
+                }
+            }
+        });
+        {#        }#}
+
+    });
+    $(document).on('click', '.R_butt_green.pull-right.font-size-10', function () {
+        {#        if (confirm("آیا مطمئن هستید ؟ این عملیات غیر قابل بازگشت است.")) {#}
+        var _id = $(this).attr("data-id");
+        var _visitor_id = $(this).attr("data-visitor");
+        $.ajax({
+            data: {_id: _id, _xsrf: '{{ handler.xsrf_token }}', visitor_id: _visitor_id, method: "yes"},
+            type: 'put',
+            url: '{{ reverse_url('system_dashboard') }}',
+            success: function (data) {
+                if (data['status']) {
+                    alert("عملیات مورد نظر با موفقیت انجام شد.");
+                    $(".__row").slideUp();
+                } else {
+                    alert("خطا در انجام عملیات. مجدداً تلاش کنید.");
+                }
+            }
+        });
+
+    });
+    $(document).on('click', '.R_butt_green.pull-left.font-size-10.send_mail', function () {
+        {#        if (confirm("آیا مطمئن هستید ؟ این عملیات غیر قابل بازگشت است.")) {#}
+        {#        var sys_id = $(this).attr("data-id");#}
+        var mail = $(this).attr("data-mail");
+        {#        var _visitor_id = $(this).attr("data-visitor");#}
+        $.ajax({
+            data: {_xsrf: '{{ handler.xsrf_token }}', "mail": mail},
+            type: 'post',
+            url: '{{ reverse_url('system_dashboard') }}',
+            success: function (data) {
+                if (data['status']) {
+                    alert("عملیات مورد نظر با موفقیت انجام شد.");
+                    $(".__row2").slideUp();
+                } else {
+                    alert("خطا در انجام عملیات. مجدداً تلاش کنید.");
+                }
+            }
+        });
+
+    });
+
+</script>
+{% end block bottom_script %}

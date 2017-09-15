@@ -1,0 +1,141 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/help/help.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-3 col-sm-3">
+            <div class="__side">
+                <div class="__lnk {% if hid == 1 %}active {% end %}" data-id="1">درباره سیستم</div>
+                <div class="__lnk {% if hid == 2 %}active {% end %}" data-id="2">پیام ها</div>
+                <div class="__lnk {% if hid == 3 %}active {% end %}" data-id="3">افزودن خبر جدید</div>
+                <div class="__lnk {% if hid == 4 %}active {% end %}" data-id="4">مدیریت خبرها</div>
+                <div class="__lnk {% if hid == 5 %}active {% end %}" data-id="5">خبر های در انتظار تائید</div>
+                <div class="__lnk {% if hid == 6 %}active {% end %}" data-id="6">مدیریت مجموعه ها</div>
+                <div class="__lnk {% if hid == 7 %}active {% end %}" data-id="7">مجموعه های پیش فرض هر نقش</div>
+                <div class="__lnk {% if hid == 8 %}active {% end %}" data-id="8">مدیریت کاربران</div>
+                <div class="__lnk {% if hid == 9 %}active {% end %}" data-id="9">افزودن کاربر جدید</div>
+                <div class="__lnk {% if hid == 10 %}active {% end %}" data-id="10">گروه های کاربری سیستم</div>
+                <div class="__lnk {% if hid == 11 %}active {% end %}" data-id="11">مدیریت نقش های کاربر</div>
+                <div class="__lnk {% if hid == 12 %}active {% end %}" data-id="12">مجوزهای دسترسی</div>
+                <div class="__lnk {% if hid == 13 %}active {% end %}" data-id="13">تعریف ویرایشگر</div>
+                <div class="__lnk {% if hid == 14 %}active {% end %}" data-id="14">مدیریت تصاویر اسلایدر</div>
+            </div>
+        </div>
+        <div class="col-md-9 col-sm-9">
+            <div class="__container">
+                <div class="heading">درباره سیستم</div>
+
+                <div class="padding-10 {% if hid != 1 %}display-none{% end %} text-justify txt" data-id="1">
+                    با تشکر از اینکه سیستم اطلاع رسانی خبرنامه را انتخاب کردید ، مراحل کار با سیستم به طور خلاصه به صورت
+                    زیر بیان می شود.
+                    <br>
+                    <br>
+                    هدف این سیستم ، اطلاع رسانی به گروه های هدف از طریق دسته بندی مخاطبین و نقش های سیستمی هر کاربر می
+                    باشد. لذا لازم است قبل از نگارش متن خبر ، نقش های سیستمی و مجموعه های خبری را مشخص کرده باشید.
+                    <br>
+                    <br>
+                    برای این کار ، ابتدا از منوی «نقش ها» گزینه «مدیریت نقش های سیستم» را انتخاب نموده و در صفحه باز شده
+                    ، اقدام به ایجاد ، ویرایش و یا حذف نقش ها و گروه های کاربری سیستم نمایید.
+                    <br>
+                    <br>
+                    پس از این کار ، بایستی مجموعه های سیستم تعریف شوند. برای این کار از منوی «مجموعه ها» گزینه «مدیریت
+                    مجموعه ها» را انتخاب کنید.
+                    در صفحه باز شده ، شما میتوانید مجموعه های سیستم را به صورت درختی تعریف و مجموعه های جدیدی اضافه
+                    نمایید.
+                    <br>
+                    <br>
+                    پس از ایجاد مجموعه ها ، لازم است که برای هر نقش ، مجموعه هایی که میتواند به آن دسترسی داشته باشد و
+                    خبرهای آن ها را مشاهده نماید ، مشخص شود.
+                    برای این کار از منوی «مجموعه ها» گزینه «مجموعه های پیش فرض هر نقش» را انتخاب نمایید.
+                    در صفحه باز شده میتوانید با انتخاب هر نقش ، مجموعه های مجاز برای گروه های کاربری را انتخاب و ذخیره
+                    نمایید.
+                    <br>
+                    <br>
+                    سیستم آماده به کار است ! شما میتوانید با انتخاب گزینه «افزودن خبر جدید» و نگارش متن خبر و انتخاب
+                    تنظیمات دلخواه ، خبر و یا اطلاعیه مورد نظر را ثبت نمایید.
+
+                </div>
+                <div class="padding-10 text-justify {% if hid != 2 %}display-none{% end %} txt" data-id="2">
+{#                    در حال تکمیل...2#}
+                    در قسمت ارسال پیام میتوانید با زدن کلید انتخاب گیرندگان  ، کاربرانی که میخواهید پیامتان را دریافت کنند را انتخاب کنید . که در پنجره سمت راست صفحه نمایش داده خواهند شد.
+                    <br>
+{#                    <br>#}
+                    در پنجره سمت چپ نیز متن پیام را وارد میکنید و با زدن کلید  ارسال پیام ، متن مورد نظر ارسال خواهد شد.
+                    <br>
+                    <br>
+                    قسمت پیام های دریافتی نیز  شامل دو بخش  پیام های  دریافتی و پیام های خوانده شده میباشد.
+                </div>
+                <div class="padding-10 text-justify {% if hid != 3 %}display-none{% end %} txt" data-id="3">
+{#                    در حال تکمیل...3#}
+                    در صفحه افزودن خبر جدید همان طور که مشخص است ابتدا عنوان و متن خبر  باید وارد شود.
+                    <br>
+                    در ادامه با زدن کلید افزودن تصویر میتوانید یک عکس برای خبرتان انخاب کنید.
+                    <br>
+                    <br>
+                    کلیدواژه های هر خبر در واقع کلمات کلیدی هر خبر هستند که متن خبر به انها مرتبط است (مثلا : ورزشی، فرهنگی و ...) که در بعدا برای نمایش خبرهایی که کلیدواژه های یکسان دارند از آنها استفاده میکنیم.
+                    <br>
+                    <br>
+                    در ادامه در قسمت تنظیمات خبر نیز باید نوع متن که (اطلاعیه، خبر ویا مربوط به گالری عکس ) می باشد مشخص شود. سپس با انتخاب مجموعه در آخرین مرحله در واقع شما مشخص میکنید که با قرار گرفتن این خبر در چه مجموعه ای، چه کسانی به آن دسترسی دارند.  با توجه به اینکه هر کاربر  به مجموعه ای که مدیر قبلا مشخص کرده دسترسی دارد.
+                    <br>
+                </div>
+                <div class="padding-10 text-justify {% if hid != 4 %}display-none{% end %} txt" data-id="4">
+{#                    در حال تکمیل...4#}
+                    در صفحه مدیریت خبرها تمام خبر ها  نمایش داده شده و شما میتوانید با انتخاب مجموعه مورد نظر فقط خبرهای مربوط به ان مجموعه را مشاهده کنید. برای هر خبر در سمت چپ هر ردیف کلید ویرایش و حذف خبر وجود دارد. با زدن کلید  ویرایش (کلید آبی رنگ) میتوانید متن کامل خبر را مشاهده و ویرایش کنید. همچنین میتوانید با زدن کلید حذف (قرمز رنگ) خبر را حذف کنید.
+                </div>
+                <div class="padding-10 text-justify {% if hid != 5 %}display-none{% end %} txt" data-id="5">
+                    در حال تکمیل...5
+                </div>
+                <div class="padding-10 text-justify {% if hid != 6 %}display-none{% end %} txt" data-id="6">
+                    در حال تکمیل...6
+                </div>
+                <div class="padding-10 text-justify {% if hid != 7 %}display-none{% end %} txt" data-id="7">
+                    در حال تکمیل...7
+                </div>
+                <div class="padding-10 text-justify {% if hid != 8 %}display-none{% end %} txt" data-id="8">
+                    در حال تکمیل...8
+                </div>
+                <div class="padding-10 text-justify {% if hid != 9 %}display-none{% end %} txt" data-id="9">
+                    در حال تکمیل...9
+                </div>
+                <div class="padding-10 text-justify {% if hid != 10 %}display-none{% end %} txt" data-id="10">
+                    در حال تکمیل...10
+                </div>
+                <div class="padding-10 text-justify {% if hid != 11 %}display-none{% end %} txt" data-id="11">
+                    در حال تکمیل...11
+                </div>
+                <div class="padding-10 text-justify {% if hid != 12 %}display-none{% end %} txt" data-id="12">
+                    در حال تکمیل...12
+                </div>
+                <div class="padding-10 text-justify {% if hid != 13 %}display-none{% end %} txt" data-id="13">
+                    در حال تکمیل...13
+                </div>
+                <div class="padding-10 text-justify {% if hid != 14 %}display-none{% end %} txt" data-id="14">
+                    14 در حال تکمیل...
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% end block container %}
+
+
+{% block bottom_script %}
+{#<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>#}
+<script type="text/javascript">
+    $(".__lnk").click(function () {
+        $(".__lnk").removeClass("active");
+        $(this).addClass("active");
+        $(".heading").text($(this).text());
+        $(".txt").hide();
+        $(".txt[data-id=" + $(this).attr("data-id") + "]").fadeIn();
+    });
+</script>
+{% end block bottom_script %}

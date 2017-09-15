@@ -1,0 +1,394 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/messages/messages.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<form action="{{ reverse_url("system_messages_send_new") }}" method="post" enctype="multipart/form-data">
+
+    <div class="form-horizontal">
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+        {% end if %}
+
+        {% if handler.has_error() %}
+        {% for m in handler.get_errors() %}
+        <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+        {% end %}
+        {% end if %}
+
+        <div class="col-md-10 col-md-offset-1 col-sm-12">
+
+            <div class="form-group margin-top-15">
+                {#                <label class="col-md-2 control-label">عنوان پیام :</label>#}
+                {##}
+                {#                <div class="col-md-10">#}
+                {#                    <input name="title" placeholder="عنوان پیام را وارد کنید." class="form-control">#}
+                {#                </div>#}
+            </div>
+        </div>
+
+        <div class="col-md-10 col-md-offset-1 col-sm-12">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="pnl_box">
+                        <div class="head">
+                            <div class="row margin-0">
+                                <span id="select_users_list" class="R_butt_green pull-right font-size-10">انتخاب گیرندگان</span>
+                                <span id="clear_user_list"
+                                      class="R_butt_gray pull-left font-size-10">پاک کردن لیست</span>
+                            </div>
+                        </div>
+                        <div class="body" id="receivers_container">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="pnl_box">
+                        <div class="head font-size-12">متن پیام :</div>
+                        <textarea name="text" class="body" placeholder="متن پیام را وارد کنید."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row margin-0">
+            <div class="form-actions fluid ">
+                <div class="col-md-12 text-center margin-10-center">
+                    <button type="submit" class="R_butt_blue">ارسال پیام</button>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="receivers" value="[]">
+        {% module xsrf_form_html() %}
+
+        <div class="margin-30-center clearfix"></div>
+    </div>
+</form>
+
+<div class="modal fade in" id="users_show" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog width-35-darsad">
+        <div class="modal-content border-radius-7">
+            <div class="modal_header">
+                <span>انتخاب گیرندگان</span>
+                <span class="pull-left fa fa-times cursor-pointer" data-dismiss="modal" aria-hidden="true"></span>
+            </div>
+            <div class="modal_body">
+                <div class="row margin-10-center">
+
+                    <div class="modal_filter_container">
+                        <div class="col-md-12">
+                            {% if subsystems %}
+                            <div class="input-group ">
+                                <span class="input-group-addon font-size-9">فیلتر بر اساس سیستم ها </span>
+                                <select class="select form-control" id="by_subsystem" name="subsystem">
+                                    {% for i in subsystems %}
+                                    <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                                    {% end %}
+                                </select>
+                            </div>
+                            {% end %}
+
+                            {% if collections_sys %}
+                            <div class="input-group margin-top-5">
+                                <div class="input-group ">
+                                    <span class="input-group-addon font-size-9">فیلتر بر اساس مجموعه ها </span>
+                                    <select class="select form-control" id="by_collection" name="collection">
+                                        {% for i in collections_sys %}
+                                        <option value="{{ i['id'] }}">{{ i['name'] }}</option>
+                                        {% end %}
+                                    </select>
+                                </div>
+                            </div>
+                            {% end %}
+
+                            <div class="input-group margin-top-5">
+                                <span class="input-group-addon font-size-9">فیلتر بر اساس نام</span>
+                                <input type="text" class="form-control" id="by_name" title="نام">
+                            </div>
+                            <div class="input-group margin-top-5">
+                                <span class="input-group-addon font-size-9">فیلتر بر اساس نام کاربری</span>
+                                <input type="text" class="form-control" id="by_username" title="نام کاربری">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal_user_container">
+                        <div class="col-md-12">
+                            <label title="انتخاب همه کاربران" class="width-100-darsad display-block">
+                                <span class="__sp1">
+                                    <input id="select_all1" autocomplete="off" type="checkbox" class="vertical-middle"
+                                           value="all">
+                                </span>
+                                <span class="__sp2">انتخاب همه کاربران</span>
+                                <span class="__sp3">نام کاربری</span>
+                            </label>
+                            <hr class="display-block width-100-darsad margin-0-center">
+                        </div>
+                        {% for i in users %}
+                        {% if i['id'] != handler.current_user %}
+                        <div class="col-md-12 __row" data-id="{{ i['id'] }}">
+                            <label title="{{ i['first_name'] + " " + i['last_name'] }}"
+                                   class="width-100-darsad display-block">
+                                <span class="__sp1">
+                                    <input type="checkbox" data-visable="true" autocomplete="off"
+                                           class="user_c1 vertical-middle" value="{{ i['id'] }}"
+                                           data-system="{{ i['system'] }}"
+                                           data-name="{{ i['first_name'] + " " + i['last_name'] }}"
+                                           data-username="{{ i['username'] }}">
+                                </span>
+
+                                <span class="__sp2">{{ i['first_name'] + " " + i['last_name'] }}</span>
+                                <span class="__sp3">{{ i['username'] }}</span>
+
+                            </label>
+                        </div>
+                        {% end %}
+                        {% end %}
+
+                        <div class="clearfix"></div>
+                        <div id="nothing_to_show" class="font-size-9 margin-top-10 colorGray display-none">موردی وجود
+                            ندارد.
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 text-center margin-top-5">
+                        <button class="R_butt_blue do_select" data-id="1">انتخاب</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+
+
+<script type="text/html" id="__rows">
+    <div class="rcv" data-id="<%= id %>">
+        <span><%= name %></span>
+        <i class="fa fa-times" data-id="<%= id %>"></i>
+    </div>
+</script>
+
+<script type="text/javascript">
+    $(".select").select2();
+
+    $("#select_users_list").click(function () {
+        $("#users_show").modal("show");
+    });
+    $("#clear_user_list").click(function () {
+        f_list = [];
+        $(".rcv").remove();
+        $("input[name=receivers]").val(JSON.stringify(f_list));
+    });
+    var checked = false;
+    $("#select_all1").click(function () {
+        checked = (!checked);
+        $(".user_c1").prop("checked", checked);
+    });
+
+    var f_list = [];
+    $(".do_select").click(function () {
+        $.each($(".user_c1:checked"), function () {
+            if (f_list.indexOf(parseInt($(this).val())) < 0) {
+                var v = $(this).val(), name = $(this).attr("data-name");
+                $("#receivers_container").append(_.template($("#__rows").html())({id: v, name: name}));
+                f_list.push(parseInt($(this).val()));
+            }
+        });
+        if (f_list.length) {
+            $("#users_show").modal("hide");
+            $("input[name=receivers]").val(JSON.stringify(f_list));
+        } else {
+            alert("کاربران مورد نظر خود را انتخاب کنید.");
+        }
+
+
+    });
+
+    $(document).on("click", ".rcv i.fa.fa-times", function () {
+        var index = f_list.indexOf(parseInt($(this).attr("data-id")));
+        if (index > -1) {
+            f_list.splice(index, 1);
+            $(".rcv[data-id=" + $(this).attr("data-id") + "]").remove();
+            $("input[name=receivers]").val(JSON.stringify(f_list));
+        }
+    });
+
+
+    $('select[name=subsystem]').change(function () {
+        var _v = $('select[name=subsystem]').val();
+        var cnt = 0;
+        if (_v == "all") {
+            $(".__row").show();
+            cnt++;
+        } else {
+            $.each($(".user_c1"), function () {
+                if ($(this).attr("data-system") == _v) {
+                    $(".__row[data-id=" + $(this).val() + "]").show();
+                    cnt++;
+                }
+                else {
+                    $(".__row[data-id=" + $(this).val() + "]").hide();
+                }
+            });
+        }
+        var noptions = "";
+        $.ajax({
+            data: {pid: _v, _xsrf: '{{ handler.xsrf_token }}'},
+            type: 'post',
+            cache: true,
+            url: '{{ reverse_url("get_collections") }}',
+            async: true,
+            success: function (output3) {
+                if (output3 != '0') {
+                    var first_id = output3['sys_colls'][0]['id'];
+                    for (var i in output3['sys_colls']) {
+                        noptions += "<option value='" + output3['sys_colls'][i]['id'] + "'>" + output3['sys_colls'][i]['name'] + "</option>";
+                    }
+                }
+                $(".select[name=collection]").html(noptions).select2("val", first_id);
+            }, complete: function (output) {
+            }
+        });
+
+        if (cnt == 0) {
+            $("#nothing_to_show").show();
+        } else {
+            $("#nothing_to_show").hide();
+        }
+    });
+
+
+    $('select[name=collection]').change(function () {
+        var _v = $(this).val();
+        var cnt = 0;
+        if (_v == "all") {
+            var s_v = $('select[name=subsystem]').val();
+            if (s_v && s_v != "all") {
+                $.each($(".user_c1"), function () {
+                    if ($(this).attr("data-system") == s_v) {
+                        $(".__row[data-id=" + $(this).val() + "]").show();
+                        cnt = cnt + 1;
+                    }
+                    else {
+                        $(".__row[data-id=" + $(this).val() + "]").hide();
+                    }
+                });
+            }
+
+            else {
+                $(".__row").show();
+                cnt = cnt + 1;
+            }
+            if (cnt == 0) {
+                $("#nothing_to_show").show();
+            } else {
+                $("#nothing_to_show").hide();
+            }
+        }
+        else {
+            {#            cnt = 1;#}
+            $.ajax({
+                'data': {
+                    'col_id': _v,
+                    'method': 'post',
+                    _xsrf: '{{ handler.xsrf_token }}'
+                },
+                'type': 'put',
+                'url': "{{ url('system_messages_send_new') }}",
+                'success': function (response) {
+                    if (response) {
+                        $.each($(".user_c1"), function () {
+                            $(".__row[data-id=" + $(this).val() + "]").hide();
+                            $("#nothing_to_show").show();
+                        });
+
+                        for (var i in response['users_col']) {
+                            $(".__row[data-id=" + response['users_col'][i]['id'] + "]").show();
+                            $("#nothing_to_show").hide();
+                        }
+                    }
+                }
+            });
+        }
+
+    });
+
+    $(document).on("keydown keyup keypress", "#by_name", function () {
+        var _v = $(this).val();
+        var cnt = 0;
+        $.each($(".user_c1"), function () {
+            if ($(this).attr("data-name").contains(_v)) {
+                $(".__row[data-id=" + $(this).val() + "]").show();
+                cnt++;
+            } else {
+                $(".__row[data-id=" + $(this).val() + "]").hide();
+            }
+        });
+        if (cnt == 0) {
+            $("#nothing_to_show").show();
+        } else {
+            $("#nothing_to_show").hide();
+        }
+    });
+    $(document).on("keydown keyup keypress", "#by_username", function () {
+        var _v = $(this).val();
+        var cnt = 0;
+        $.each($(".user_c1"), function () {
+            if ($(this).attr("data-username").contains(_v)) {
+                $(".__row[data-id=" + $(this).val() + "]").show();
+                cnt++;
+            } else {
+                $(".__row[data-id=" + $(this).val() + "]").hide();
+            }
+        });
+        if (cnt == 0) {
+            $("#nothing_to_show").show();
+        } else {
+            $("#nothing_to_show").hide();
+        }
+    });
+
+    $("form").submit(function (e) {
+
+        if ($("input[name=title]").val() == "") {
+            e.preventDefault();
+            alert("عنوان پیام را وارد کنید.");
+            return false;
+        }
+        if ($("textarea[name=text]").val() == "") {
+            e.preventDefault();
+            alert("متن پیام را وارد کنید.");
+            return false;
+        }
+        var z = $("input[name=receivers]").val();
+        if (z != "[]") {
+            if (!(JSON.parse(z))) {
+                e.preventDefault();
+                alert("لیست گیرندگان پیام نادرست است.");
+                return false;
+            }
+        } else {
+            e.preventDefault();
+            alert("گیرندگان پیام را انتخاب کنید.");
+            return false;
+        }
+    });
+</script>
+{% end block bottom_script %}

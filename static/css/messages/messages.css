@@ -1,0 +1,137 @@
+/*author : ReS4*/
+
+.pnl_box .head{
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    background: #dadada;
+    border: solid 1px #dadada;
+    border-bottom: none;
+    color: #555555;
+    height: 50px;
+}
+.pnl_box .body{
+    padding: 10px;
+    background: white;
+    border: solid 1px #dadada;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    color: #828282;
+    height: 200px;
+}
+.pnl_box textarea.body{
+    width: 100%;
+    resize: none;
+}
+
+.modal_filter_container{
+    max-height: 400px;
+    width: 100%;
+    overflow-y: auto;
+    font-size: 10pt;
+    padding: 10px;
+    border-radius: 5px;
+    border: solid 1px #c7c7c7;
+    margin-top: 10px;
+}
+
+.modal_filter_container .input-group{
+    width: 100%;
+}
+
+.modal_filter_container .input-group .input-group-addon{
+    width: 40%;
+}
+
+.modal_user_container{
+    max-height: 400px;
+    width: 100%;
+    overflow-y: auto;
+    font-size: 10pt;
+    padding: 10px;
+    border-radius: 5px;
+    border: solid 1px #c7c7c7;
+    margin-top: 10px;
+}
+
+.modal_user_container .__sp1{
+    display: inline-block;
+    width: 5%;
+}
+.modal_user_container .__sp2{
+    vertical-align: middle;
+    margin-right: 10px;
+    width: 40%;
+    margin-top: 4px;
+    display: inline-block;
+}
+.modal_user_container .__sp3{
+    vertical-align: middle;
+    width: 45%;
+    margin-top: 4px;
+    display: inline-block;
+    text-align: center;
+}
+
+#receivers_container .rcv{
+    display: inline-block;
+    background: #e2e2e2;
+    padding: 7px 10px;
+    border-radius: 3px;
+    font-size: 9pt;
+    margin: 1px 0;
+}
+
+#receivers_container .rcv span{
+    color: #686868;
+    vertical-align: middle;
+}
+#receivers_container .rcv i.fa.fa-times{
+    color: #686868;
+    vertical-align: middle;
+    cursor: pointer;
+}
+#receivers_container .rcv i.fa.fa-times:hover{
+    color: #aaaaaa;
+}
+
+.__msg_box{
+    background: #fbfbfb;
+    text-align: justify;
+    margin-top: 5px;
+    padding: 0 10px 10px 10px;
+    border-radius: 4px;
+    border: solid 1px #dfdfdf;
+    position: relative;
+}
+.__msg_box .dt{
+    font-size: 8pt;
+    display: inline-block;
+    background: #488bca;
+    padding: 5px;
+    border-radius: 3px;
+    position: relative;
+    right: -18px;
+    top: 6px;
+    margin-bottom: 9px;
+    color: white;
+}
+
+.__msg_box .del{
+    float: left;
+    font-size: 8pt;
+    display: inline-block;
+    background: #d70c0c;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    position: relative;
+    left: -18px;
+    top: 6px;
+    margin-bottom: 9px;
+    color: white;
+}
+
+#msg_box_txt{
+    max-height: 250px;
+    overflow-y: auto;
+}

@@ -1,0 +1,189 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-8 col-sm-8 col-xs-8">نام نقش</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">ویرایش</div>
+        </div>
+
+        {% set cnt = 1 %}
+        {% for i in roles %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-8 col-sm-8 col-xs-8 __text" data-id="{{ i['id'] }}">{{ i['name'] }}</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 __butts" data-id="{{ i['id'] }}">
+            {% if i['role_name'] not in ["ADMIN", "USER", "EDITOR", "GUEST"] %}
+                <button class="butt edit" data-id="{{ i['id'] }}"><i class="fa fa-pencil"></i></button>
+                <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+            {% else %}
+                <button class="butt edit" data-id="{{ i['id'] }}" data-fix="true"><i class="fa fa-pencil"></i></button>
+            {% end %}
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+    </div>
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+
+<div class="row padding-0 margin-0">
+    <div class="col-lg-12">
+        <h3 class="page-header">افزودن نقش جدید</h3>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <form action="" method="post" class="form-horizontal">
+        <div class="form-body">
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">نام نقش :</label>
+
+                <div class="col-md-4">
+                    <input class="form-control" required="required" maxlength="40" name="role_name" type="text">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="R_butt_blue">افزودن</button>
+                </div>
+
+            </div>
+
+            {#            <div class="form-group">#}
+            {#                <label class="col-md-4 control-label">تکرار رمز عبور :</label>#}
+            {##}
+            {#                <div class="col-md-5">#}
+            {#                    <input class="form-control" required="required" name="pass_confirm" type="password">#}
+            {#                </div>#}
+            {#            </div>#}
+
+
+        </div>
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-10 col-md-12 text-center">{{ m }}</div>
+        {% end if %}
+        <input type="hidden" name="method" value="save">
+        {% module xsrf_form_html() %}
+    </form>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript">
+    $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            role_name: "required"
+        },
+        messages: {
+            role_name: "نام نقش را وارد کنید."
+        }
+    });
+
+    $(document).on("click", ".butt.delete", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_roles") }}",
+            type: "post",
+            data: {"method": "delete", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+    $(document).on("click", ".butt.edit", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+        var z = $(".__text[data-id=" + _id + "]");
+        z.html('<input type="text" class="form-control" value="' + z.text() + '" data-original-val="' + z.text() + '" data-id="' + _id + '">');
+        var ht = '<button class="butt accept" data-id="' + _id + '" ' + ((_fix) ? 'data-fix="true"' : '') + '><i class="fa fa-check"></i></button>' +
+                ' <button class="butt cancel" data-id="' + _id + '" ' + ((_fix) ? 'data-fix="true"' : '') + '><i class="fa fa-circle-o"></i></button>';
+
+        $(".__butts[data-id=" + _id + "]").html(ht);
+    });
+
+    $(document).on("click", ".butt.cancel", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+
+        var j = $("input[data-id=" + _id + "]");
+        var z = $(".__text[data-id=" + _id + "]");
+        z.html(j.attr("data-original-val"));
+
+        var ht = '<button class="butt edit" data-id="' + _id + '" '+ ((_fix)? 'data-fix="true"': '') +'><i class="fa fa-pencil"></i></button> ';
+        if(!_fix)
+            ht += '<button class="butt delete" data-id="' + _id + '"><i class="fa fa-times"></i></button>';
+        $(".__butts[data-id=" + _id + "]").html(ht);
+    });
+
+    $(document).on("click", ".butt.accept", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+
+        var j = $("input[data-id=" + _id + "]");
+        var z = $(".__text[data-id=" + _id + "]");
+        if(j.val() == ''){
+            return;
+        }
+        $.ajax({
+            url: "{{ url("system_roles") }}",
+            type: "post",
+            data: {method: "update", cid: _id, _val: j.val(), _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    z.html(j.val());
+                    $(".del_msg").text("ویرایش با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    z.html(j.attr("data-original-val"));
+                    $(".del_msg").text("خطا در ویرایش اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+
+        var ht = '<button class="butt edit" data-id="' + _id + '" '+ ((_fix)? 'data-fix="true"': '') +'><i class="fa fa-pencil"></i></button> ';
+        if(!_fix)
+            ht += '<button class="butt delete" data-id="' + _id + '"><i class="fa fa-times"></i></button>';
+        $(".__butts[data-id=" + _id + "]").html(ht);
+    });
+
+</script>
+{% end block bottom_script %}

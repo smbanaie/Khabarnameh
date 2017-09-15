@@ -1,0 +1,43 @@
+/*author : ReS4*/
+
+.__side ,.__container{
+    background: #fcfcfc;
+    border: solid 1px #f3f3f3;
+    padding: 0 5px;
+    border-radius: 5px;
+    color: #5d5d5d;
+    margin-bottom: 40px;
+}
+
+.__side .__lnk {
+    padding: 8px 5px;
+    margin: 4px auto;
+    cursor: pointer;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.__side .__lnk.active {
+    background: #f0f0f0;
+    border-radius: 5px;
+}
+
+.__side .__lnk:hover {
+    background: #e3e3e3;
+    border-radius: 5px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.heading{
+    color: #45ca33;
+    font-size: 14pt;
+    padding:10px;
+    border-bottom: solid 1px #e7e7e7;
+}

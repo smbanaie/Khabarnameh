@@ -1,0 +1,204 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">آی دی سایت</div>
+            <div class="col-md-5 col-sm-5 col-xs-5"> ساب دامین</div>
+            <div class="col-md-3 col-sm-3 col-xs-3">ویرایش</div>
+        </div>
+
+        {% set cnt = 1 %}
+        {% for i in sub_domains %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 site_id__text" data-id="{{ i['id'] }}">{{ i['site_id'] }}</div>
+            <div class="col-md-5 col-sm-5 col-xs-5 sub_domain__text" data-id="{{ i['id'] }}">{{ i['sub_domain'] }}</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 __butts" data-id="{{ i['id'] }}">
+
+                <button class="butt edit" data-id="{{ i['id'] }}"><i class="fa fa-pencil"></i></button>
+                <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+    </div>
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+
+<div class="row padding-0 margin-0">
+    <div class="col-lg-12">
+        <h3 class="page-header">افزودن ساب دامین جدید</h3>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <form action="" method="post" class="form-horizontal">
+        <div class="form-body">
+
+            <div class="form-group">
+                <label class="col-md-2 control-label">آی دی سایت :</label>
+
+                <div class="col-md-2">
+                    <input class="form-control" required="required" maxlength="40" name="site_id" type="text">
+                </div>
+                <label class="col-md-2 control-label">ساب دامین :</label>
+
+                <div class="col-md-4">
+                    <input class="form-control text-left" required="required" maxlength="40"
+                           placeholder="/http://www.bums.ac.ir" name="sub_domain" type="text">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="R_butt_blue">افزودن</button>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-10 col-md-12 text-center">{{ m }}</div>
+        {% end if %}
+        <input type="hidden" name="method" value="save">
+        {% module xsrf_form_html() %}
+    </form>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript">
+    $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            site_id: "required",
+            sub_domain: "required"
+        },
+        messages: {
+            site_id: " سایت آی دی را وارد کنید.",
+            sub_domain: "ساب دامین را وارد کنید."
+        }
+    });
+
+    $(document).on("click", ".butt.delete", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_settings_subdomain") }}",
+            type: "post",
+            data: {"method": "delete", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+    $(document).on("click", ".butt.edit", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+        var site = $(".site_id__text[data-id=" + _id + "]");
+        var sub = $(".sub_domain__text[data-id=" + _id + "]");
+        site.html('<input type="text" class="form-control" value="' + site.text() + '" data-original-val="' + site.text() + '" data-id-site="' + _id + '">');
+        sub.html('<input type="text" class="form-control text-left" value="' + sub.text() + '" data-original-val="' + sub.text() + '" data-id-sub="' + _id + '">');
+        var ht = '<button class="butt accept" data-id="' + _id + '" ' + ((_fix) ? 'data-fix="true"' : '') + '><i class="fa fa-check"></i></button>' +
+                ' <button class="butt cancel" data-id="' + _id + '" ' + ((_fix) ? 'data-fix="true"' : '') + '><i class="fa fa-circle-o"></i></button>';
+
+        $(".__butts[data-id=" + _id + "]").html(ht);
+    });
+
+    $(document).on("click", ".butt.cancel", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+
+        var i = $("input[data-id-site=" + _id + "]");
+        var j = $("input[data-id-sub=" + _id + "]");
+        var site = $(".site_id__text[data-id=" + _id + "]");
+        var sub = $(".sub_domain__text[data-id=" + _id + "]");
+        site.html(i.attr("data-original-val"));
+        sub.html(j.attr("data-original-val"));
+
+        var ht = '<button class="butt edit" data-id="' + _id + '" ' + ((_fix) ? 'data-fix="true"' : '') + '><i class="fa fa-pencil"></i></button> ';
+        if (!_fix)
+            ht += '<button class="butt delete" data-id="' + _id + '"><i class="fa fa-times"></i></button>';
+        $(".__butts[data-id=" + _id + "]").html(ht);
+    });
+
+    $(document).on("click", ".butt.accept", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+
+        var site = $("input[data-id-site=" + _id + "]");
+        var sub = $("input[data-id-sub=" + _id + "]");
+        var q = $(".site_id__text[data-id=" + _id + "]");
+        var z = $(".sub_domain__text[data-id=" + _id + "]");
+
+        if (site.val() == '' || sub.val() == '') {
+            return;
+        }
+        $.ajax({
+            url: "{{ url("system_settings_subdomain") }}",
+            type: "post",
+            data: {
+                method: "update",
+                cid: _id,
+                site_id: site.val(),
+                sub_domain: sub.val(),
+                _xsrf: '{{ handler.xsrf_token }}'
+            },
+            success: function (resp) {
+                if (resp['status']) {
+                    q.html(site.val());
+                    z.html(sub.val());
+                    $(".del_msg").text("ویرایش با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    q.html(q.attr("data-original-val"));
+                    z.html(z.attr("data-original-val"));
+                    $(".del_msg").text("خطا در ویرایش اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+
+        var ht = '<button class="butt edit" data-id="' + _id + '" ' + ((_fix) ? 'data-fix="true"' : '') + '><i class="fa fa-pencil"></i></button> ';
+        if (!_fix)
+            ht += '<button class="butt delete" data-id="' + _id + '"><i class="fa fa-times"></i></button>';
+        $(".__butts[data-id=" + _id + "]").html(ht);
+    });
+
+</script>
+{% end block bottom_script %}

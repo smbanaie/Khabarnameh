@@ -1,0 +1,174 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+{% set m = handler.get_flash('msg') %}
+{% if m != None %}
+<div class="colorGreen font-size-10 col-md-12 text-center">{{ m }}</div>
+{% end if %}
+<input type="hidden" name="method" value="save">
+{% module xsrf_form_html() %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-10">
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">میهمان</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">نام کاربری</div>
+            <div class="col-md-6 col-sm-6 col-xs-6">سیستم ها</div>
+            <div class="col-md-1 col-sm-1 col-xs-1">حذف</div>
+        </div>
+        {% set cnt = 1 %}
+        {% for i in guest_users %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 " data-id="{{ i['id'] }}">{{ i['first_name'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 " data-id="{{ i['id'] }}">{{ i['username'] }}</div>
+            <div class="col-md-6 col-sm-6 col-xs-6" data-id="{{ i['id'] }}">
+{#                {% for j in i['sys'] %}#}
+{#                {{ j }} ,#}
+{#                {% end %}#}
+                {{   " , ".join(i['sys']) }}
+            </div>
+            <div class="col-md-1 col-sm-1 col-xs-1 __butts" data-id="{{ i['id'] }}">
+                <button class="butt delete" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+
+            </div>
+        </div>
+        {% set cnt = cnt + 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+    </div>
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none"></div>
+
+
+</div>
+
+<div class="row padding-0 margin-0">
+    <div class="col-lg-12">
+        <h3 class="page-header">افزودن میهمان جدید</h3>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <form action="" method="post" class="form-horizontal">
+        <div class="form-body">
+
+            <div class="form-group">
+                <label class="col-md-2 control-label">نام مهمان</label>
+
+                <div class="col-md-2">
+                    <input class="form-control" required="required" maxlength="40" name="guest_name" type="text">
+                </div>
+
+                <div class="_school">
+                    <label class="col-md-3 control-label">زیر سیستم ها :</label>
+
+                    <div class="col-md-4">
+                        <div id="jstree_div" class="margin-top-6"></div>
+                    </div>
+                </div>
+                <input type="hidden" name="subsystems">
+
+                <div class="col-md-2 col-md-offset-5">
+                    <button type="submit" class="R_butt_green">ثبت اطلاعات</button>
+                </div>
+
+            </div>
+
+        </div>
+        {% module xsrf_form_html() %}
+    </form>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+<script type="text/javascript">
+
+    $('#jstree_div').jstree({
+                'core': {
+                    "multiple": true,
+                    'data': JSON.parse('{% raw js_tree %}')
+                },
+                "plugins": ["checkbox"],
+                checkbox: {keep_selected_style: false}
+            }
+    ).on('loaded.jstree', function () {
+                $(this).jstree('open_all');
+            });
+
+    var _frm = $("form");
+    _frm.on("submit", function (e) {
+        var checked_ids = [], str = null;
+        $.each($('#jstree_div').jstree("get_checked", true), function () {
+            checked_ids.push(this.id);
+
+        });
+        if (checked_ids.length > 0) {
+            str = JSON.stringify(checked_ids);
+            $("input[name=subsystems]").val(str);
+        }
+        {#        alert(str)#}
+
+        if (str == null) {
+            alert("سیستم مورد نظر را انتخاب کنید.");
+            e.preventDefault();
+            return false;
+        }
+    });
+
+
+    $("form").validate({
+        errorClass: "colorOrange",
+        rules: {
+            guest_name: "required"
+        },
+        messages: {
+            guest_name: "نام کاربر مهمان را وارد کنید."
+        }
+    });
+
+    $(document).on("click", ".butt.delete", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_manage_user_guest") }}",
+            type: "put",
+            data: {"cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+</script>
+{% end block bottom_script %}

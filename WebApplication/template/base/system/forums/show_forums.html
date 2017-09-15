@@ -1,0 +1,291 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    {% set m = handler.get_flash('msg') %}
+    {% if m != None %}
+    <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+    {% end if %}
+
+    {% if handler.has_error() %}
+    {% for m in handler.get_errors() %}
+    <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+    {% end %}
+    {% end if %}
+    <div class="colorGreen font-size-10 col-md-12 text-center del_msg display-none margin-10-center"></div>
+    <div class="clearfix"></div>
+    <div class="_list">
+
+        <div class="row _header text-center">
+            <div class="col-md-1 col-sm-1 col-xs-1">ردیف</div>
+            {#            <div class="col-md-2 col-sm-2 col-xs-2">کاربر</div>#}
+            <div class="col-md-4 col-sm-4 col-xs-4">نام</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">تاریخ</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">وضعیت</div>
+            {#            <div class="col-md-2 col-sm-2 col-xs-2">حالت</div>#}
+            <div class="col-md-1 col-sm-1 col-xs-1">بیشتر</div>
+            <div class="col-md-2 col-sm-2 col-xs-2">ویرایش</div>
+        </div>
+
+        {% set cnt = 1 %}
+        {% for i in forums %}
+        <div class="row {% if cnt % 2 %}_row_g{% else %}_row_w{% end %} text-center" data-id="{{ i['id'] }}">
+
+            <div class="col-md-1 col-sm-1 col-xs-1">{{ cnt }}</div>
+            {#            <div class="col-md-2 col-sm-2 col-xs-2 __text font-size-9">{{ i['user']['name'] }}</div>#}
+            <div class="col-md-4 col-sm-4 col-xs-4 font-size-9 __text"
+                 data-id="{{ i['id'] }}">{{ i['name'][0:35] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 font-size-8 __text">{{ i['date'] }}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 " data-id="{{ i['id'] }}">
+                {% if i['status'] == 'deactive' %}
+                <button class="butt _active deactive" data-id="{{ i['id'] }}"> فعال کردن</button>
+                {% else %}
+                <button class="butt _deactive active " data-id="{{ i['id'] }}">غیرفعال کردن</button>
+                {% end %}
+            </div>
+            {#            <div class="col-md-2 col-sm-2 col-xs-2 __text">{{ i['condition'] }}</div>#}
+            <div class="col-md-1 col-sm-1 col-xs-1" data-id="{{ i['id'] }}">
+                <button class="butt _show detail edit" data-id="{{ i['id'] }}"><i class="fa fa-search"></i></button>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-2 __butts" data-id="{{ i['id'] }}">
+                <button class="butt edit fn" data-id="{{ i['id'] }}"><i class="fa fa-pencil"></i></button>
+                <button class="butt delete Del" data-id="{{ i['id'] }}"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="col-md-12">
+                <div class="result_container" data-id="{{ i['id'] }}"></div>
+            </div>
+        </div>
+        {% set cnt += 1 %}
+        {% end %}
+
+        {% if cnt == 1 %}
+        <div class="row _row_w text-center">
+            <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div>
+        </div>
+        {% end %}
+
+
+    </div>
+
+
+</div>
+
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/underscore/underscore.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/Chart.js-master/Chart.min.js') }}"></script>
+{#<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>#}
+
+<script type="text/html" id="__rows">
+
+    <div class="row <%= row_color %> text-center" data-id="<%= id %>" style="background-color: white">
+        <span class="col-md-1 col-sm-1 col-xs-1 "><%= cnt %></span>
+        <span class="col-md-7 col-sm-7 col-xs-7 __text "><%= name %> (<%= uname %>)</span>
+        <span class="col-md-4 col-sm-4 col-xs-4 __text ">%<%= darsad %></span>
+    </div>
+
+</script>
+
+<script type="text/html" id="__rows2">
+    <div class="col-md-7">
+        <%= res %>
+    </div>
+    <div class="col-md-5">
+        <canvas id="chart<%= id %>" height="150"></canvas>
+    </div>
+
+</script>
+
+
+<script type="text/javascript">
+    {#    $(".select").select2();#}
+
+    $(document).on("click", ".butt._show.detail", function () {
+        var _id = $(this).attr("data-id");
+        $(".result_container").slideUp();
+        $.ajax({
+            url: "{{ url("system_show_forums") }}",
+            type: "post",
+            data: {"method": "show", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (data) {
+                if (data['status']) {
+{#                    j += _.template($("#__rows").html('<div class="row _row_w text-center"> <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div> </div>'));#}
+                    if (data['item']){
+                        for (var i in data['item']) {
+                            j += _.template($("#__rows").html())(
+                                    {
+                                        id: data['item'][i]['id'],
+{#                                        name: data['item'][i]['item'],#}
+{#                                        row_color: "_row_w",#}
+{#                                        cnt: cnt,#}
+{#                                        uname: data['item'][i]['count'],#}
+{#                                        darsad: data['item'][i]['darsad']#}
+                                    }
+                            );
+                        }
+                        $(".result_container[data-id=" + _id + "]").html(j).slideDown();
+                    }
+                    else {
+                        $(".result_container[data-id=" + _id + "]").html('<div class="row _row_w text-center"> <div class="col-md-12 col-sm-12 col-xs-12 font-size-10">موردی وجود ندارد.</div> </div>').slideDown();
+                    }
+                }
+                else {
+                    $(".del_msg").text("خطا در نمایش اطلاعات").fadeIn().delay(300).fadeOut();
+                }
+            }
+        });
+    });
+
+
+    {#    $(document).on("click", ".butt._show.detail", function () {#}
+    {#        var _id = $(this).attr("data-id");#}
+    {#        alert(_id);#}
+    {#    });#}
+
+    $(document).on("click", ".butt.delete.Del", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_show_forums") }}",
+            type: "post",
+            data: {"method": "delete", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".row[data-id=" + _id + "]").slideToggle();
+                    $(".del_msg").text("حذف با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در حذف اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+    $(document).on("click", ".butt._deactive.active", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_show_forums") }}",
+            type: "put",
+            data: {"method": "deactive", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    location.reload(true);
+                    $(".del_msg").text("عملیات با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در عملیات.مجدد تلاش کنید.").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+    $(document).on("click", ".butt.edit.fn", function () {
+        var _id = $(this).attr("data-id");
+        var z = $(".__text[data-id=" + _id + "]");
+        z.html('<input type="text" class="form-control" value="' + z.text() + '" data-original-val="' + z.text() + '" data-id="' + _id + '">');
+        var ht = '<button class="butt accept" data-id="' + _id + '"><i class="fa fa-check"></i></button>' +
+                ' <button class="butt cancel" data-id="' + _id + '"><i class="fa fa-circle-o"></i></button>';
+
+        $(".__butts[data-id=" + _id + "]").html(ht);
+
+    });
+
+
+    $(document).on("click", ".butt.cancel", function () {
+        var _id = $(this).attr("data-id");
+        var j = $("input[data-id=" + _id + "]");
+        var z = $(".__text[data-id=" + _id + "]");
+        z.html(j.attr("data-original-val"));
+        var ht = '<button class="butt edit fn" data-id="' + _id + '"><i class="fa fa-pencil"></i></button>' +
+                ' <button class="butt delete Del" data-id="' + _id + '"><i class="fa fa-times"></i></button>';
+
+        $(".__butts[data-id=" + _id + "]").html(ht);
+
+    });
+
+    $(document).on("click", ".butt.accept", function () {
+        var _id = $(this).attr("data-id");
+        var _fix = ($(this).attr("data-fix") == "true");
+
+        var j = $("input[data-id=" + _id + "]");
+        var z = $(".__text[data-id=" + _id + "]");
+        if (j.val() == '') {
+            return;
+        }
+        $.ajax({
+            url: "{{ url("system_show_forums") }}",
+            type: "post",
+            data: {method: "update", cid: _id, _val: j.val(), _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    z.html(j.val());
+                    $(".del_msg").text("ویرایش با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    z.html(j.attr("data-original-val"));
+                    $(".del_msg").text("خطا در ویرایش اطلاعات").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+
+        var ht = '<button class="butt edit fn" data-id="' + _id + '"><i class="fa fa-pencil"></i></button>' +
+                ' <button class="butt delete Del" data-id="' + _id + '"><i class="fa fa-times"></i></button>';
+
+        $(".__butts[data-id=" + _id + "]").html(ht);
+
+    });
+
+
+    $(document).on("click", ".butt._active.deactive", function () {
+        var _id = $(this).attr("data-id");
+
+        if (!confirm("آیا مطمئن هستید ؟")) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url("system_show_forums") }}",
+            type: "put",
+            data: {"method": "active", "cid": _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    location.reload(true);
+                    $(".del_msg").text("عملیات با موفقیت انجام شد.").fadeIn().delay(2000).fadeOut();
+                } else {
+                    $(".del_msg").text("خطا در عملیات.مجدد تلاش کنید.").fadeIn().delay(2000).fadeOut();
+                }
+            }
+        });
+    });
+
+
+    var chart_option = {
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleFontFamily: "Yekan",
+        responsive: true,
+        scaleFontStyle: "normal",
+        tooltipFontFamily: "Yekan",
+        scaleShowVerticalLines: false,
+        bezierCurve: false
+
+
+    };
+
+
+</script>
+{% end block bottom_script %}

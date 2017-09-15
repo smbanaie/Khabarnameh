@@ -1,0 +1,206 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+<!--{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}-->
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/bootstrap-tagsinput/bootstrap-tagsinput.css') }}"/>
+{% end other_head body %}
+
+{% block container %}
+
+<div class="col-md-10 col-md-offset-1 col-sm-12">
+    <div class="row">
+        <div class="form-group">
+            <label class="col-md-1 margin-top-5 control-label">موضوع :</label>
+
+            <div class="col-md-11">
+                <input name="news_title" value="{{ ticket['topic'] }}" class="form-control" disabled="disabled">
+            </div>
+        </div>
+
+            {% set m = handler.get_flash('msg') %}
+            {% if m != None %}
+                <div class="colorGreen font-size-12 col-md-12 margin-10-center text-center">{{ m }}</div>
+            {% end if %}
+            {% if handler.has_error() %}
+                {% for m in handler.get_errors() %}
+                    <div class="colorRed font-size-10 col-md-12 text-center margin-10-center">{{ m }}</div>
+                {% end %}
+            {% end if %}
+
+        <div id="result_container">
+            <div class="row _loading display-none" id="page_loader">
+                <div class="col-md-12 margin-top-30">
+                    <div class="loading display-block"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+<div class="row margin-top-10">
+    <div class="col-md-12 col-sm-12">
+        <form action="" id="" method="post" enctype="multipart/form-data" class="form-body">
+            <div class="show_box">
+                <div class="box_header visibility_header">
+                    <i class="fa fa-plus"></i>
+                    <span class=""  > پاسخ</span>
+                </div>
+                <div class="box_body hidden_body close display-none">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <span>پیام</span>
+                        </div>
+                    </div>
+                    <div class="row margin-top-10">
+                        <div class="col-md-12 col-sm-12">
+                            <textarea name="full_text" class="form-control" style="resize: none"></textarea>
+                        </div>
+                    </div>
+                    <div class="row margin-top-10">
+                        <div class="col-md-12 col-sm-12">
+                            <label class="col-md-2 control-label">ضمیمه :</label>
+                            <div class="col-md-10">
+                                <input type="file" name="attachment" data-dismiss="fileupload" id="inputAttachments"
+                                       class="form-control fileupload"/>
+
+                                <div id="fileUploadsContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row margin-top-10">
+                        <div class="col-md-12 col-sm-12 text-center">
+                            <button class="R_butt_blue " type="submit">ارسال</button>
+                            <a href="#" class="btn btn-default"> انصراف</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% module xsrf_form_html() %}
+        </form>
+    </div>
+</div>
+
+{% for i in subtikets %}
+    {% if i['type'] == "a2s" %}
+        <div class="row margin-top-10">
+            <div class="col-md-11 col-sm-11 pull-left">
+                <div class="show_box">
+                    <div class="box_header">
+                        <div class="row">
+                            <div class="col-xs-6 text-right">
+                                <span class="pull-right">{{ i['user']['full_name'] }}</span>
+                            </div>
+                            <div class="col-xs-6 text-left">
+                                <span class="pull-left">{{ i['date'] }}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="box_body">
+                        {% raw i['text'] %}
+
+                        <div class="">
+                            {% if i['file'] %}
+                            <a download="" href="{{ static_url('upload/tickets/') + i['file'] }}">
+                                دانلود فایل ضمیمه شده
+                            </a>
+                            {% end %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row margin-top-10">
+                <div class="col-md-11 col-sm-11 pull-right">
+                    <div class="show_box">
+                        <div class="box_header">
+                            <div class="row">
+                                <div class="col-xs-6 text-right">
+                                    <span class="pull-right">{{ i['user']['full_name'] }}</span>
+                                </div>
+                                <div class="col-xs-6 text-left">
+                                    <span class="pull-left">{{ i['date'] }}</span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="box_body">
+                            {% raw i['text'] %}
+
+                            <div class="">
+                                {% if i['file'] %}
+                                <a download="" href="{{ static_url('upload/tickets/') + i['file'] }}">
+                                    دانلود فایل ضمیمه شده
+                                </a>
+                                {% end %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+    {% end %}
+{% end %}
+
+</div>
+
+{% end block container %}
+{%block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/tinymce/tinymce.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript">
+    $('.visibility_header i').click(function(){
+        if($('.hidden_body').hasClass('close')){
+            $('.hidden_body').removeClass('close');
+            $('.hidden_body').addClass('open');
+            $(this).removeClass('fa-plus');
+            $(this).addClass('fa-minus');
+            $('.hidden_body').slideDown();
+        }
+        else if($('.hidden_body').hasClass('open')){
+            $('.hidden_body').removeClass('open');
+            $('.hidden_body').addClass('close');
+            $(this).removeClass('fa-minus');
+            $(this).addClass('fa-plus');
+            $('.hidden_body').slideUp();
+        }
+    });
+
+    tinymce.init({
+        selector: "textarea[name=full_text]",
+        menubar: false,
+        toolbar_items_size: 'small',
+        theme: "modern",
+        height: 200,
+        plugins: [
+            "advlist autolink link lists charmap preview hr anchor pagebreak",
+            "searchreplace wordcount visualblocks visualchars nonbreaking",
+            "save table contextmenu directionality emoticons template paste textcolor"
+        ],
+        language: 'fa',
+        directionality: 'rtl',
+        content_css: "{{ static_url('plugins/tinymce/css/content.css') }}",
+        font_formats: "Yekan=Yekan; Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n",
+
+        toolbar1: "fullpage | undo redo | bold italic underline strikethrough | ltr rtl | alignleft aligncenter alignright alignjustify | fontselect fontsizeselect",
+        toolbar2: "cut copy paste | searchreplace | outdent indent  link unlink anchor  | preview | forecolor backcolor | table | hr removeformat | emoticons | fullscreen | visualblocks restoredraft",
+
+        style_formats: [
+            {title: 'Bold text', inline: 'b'},
+            {title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},
+            {title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},
+            {title: 'Example 1', inline: 'span', classes: 'example1'},
+            {title: 'Example 2', inline: 'span', classes: 'example2'},
+            {title: 'Table styles'},
+            {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
+        ]
+    });
+
+
+</script>
+{% end block bottom_script %}

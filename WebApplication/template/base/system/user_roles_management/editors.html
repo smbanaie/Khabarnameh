@@ -1,0 +1,190 @@
+{% extends "../../dashboard_template.html" %}
+
+{% block other_head %}
+{#<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}" />#}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/public/public.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/jstree/themes/default/style.min.css') }}" />
+{% end other_head body %}
+
+{% block container %}
+
+
+<div class="col-md-12">
+    <div class="form-horizontal">
+
+        <div class="form-body">
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">نام کاربری :</label>
+
+                <div class="col-md-4">
+                    <input class="form-control" name="username">
+                </div>
+                <div class="col-md-4">
+                    <button class="R_butt_blue _select">انتخاب</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="resBox" class="display-none">
+        <div class="row">
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1 text-center">
+                <div id="user_name" class="margin-bottom-10 font-size-11"></div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <div id="jstree_div"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1">
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr class="margin-10-center">
+                    </div>
+                </div>
+                <div class="row margin-top-10 margin-bottom-20">
+                    <div class="col-md-6 col-sm-6">
+                        <span>امکان ویرایش خبرها :</span>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary font-size-9" data-en="all">
+                                <input type="radio" name="edit_news" value="all" autocomplete="off" checked> همه
+                            </label>
+                            <label class="btn btn-primary font-size-9" data-en="own">
+                                <input type="radio" name="edit_news" value="own" autocomplete="off"> خودش
+                            </label>
+                            <label class="btn btn-primary font-size-9 active" data-en="disable">
+                                <input type="radio" name="edit_news" value="disable" autocomplete="off"> هیچکدام
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <span>امکان انتشار مستقیم خبرها :</span>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary font-size-9" data-dp="yes">
+                                <input type="radio" name="direct_publish" value="yes" autocomplete="off" checked> دارد
+                            </label>
+                            <label class="btn btn-primary font-size-9 active" data-dp="no">
+                                <input type="radio" name="direct_publish" value="no" autocomplete="off"> ندارد
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1">
+                <button class="R_butt_blue _save margin-top-20">ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
+            <div class="colorGreen font-size-11 margin-20-center  del_msg display-none"></div>
+        </div>
+
+        {% set m = handler.get_flash('msg') %}
+        {% if m != None %}
+        <div class="colorGreen font-size-10 col-md-12 text-center">{{ m }}</div>
+        {% end if %}
+    </div>
+
+</div>
+<div class="margin-30-center clearfix"></div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/jstree/jstree.min.js') }}"></script>
+
+<script type="text/javascript">
+
+    $(document).on("click", ".R_butt_blue._select", function () {
+        var _id = $("input[name=username]").val();
+
+        $.ajax({
+            url: "{{ url("system_urm_editors") }}",
+            type: "put",
+            data: {username: _id, _xsrf: '{{ handler.xsrf_token }}'},
+            success: function (resp) {
+                if (resp['status']) {
+                    $("#user_name").text('مجموعه های کاربر : ' + resp['user']['first_name'] + ' ' + resp['user']['last_name']);
+                    $('#jstree_div').jstree("destroy").jstree(
+                        {
+                        'core' : {
+                            "multiple" : true,
+                            'data' : JSON.parse(resp['tree'])
+                        },
+                        "plugins" : [ "checkbox" ],
+                        checkbox : {keep_selected_style : false}
+                        }
+                    ).on('loaded.jstree', function() {
+                        $(this).jstree('open_all');
+                    });
+
+                    if(resp['settings']){
+                        $("input[name=edit_news]").removeAttr("checked");
+                        $("input[name=direct_publish]").removeAttr("checked");
+                        $("input[name=edit_news][value="+resp['settings']['edit_news']+"]").attr("checked", "checked");
+                        $("input[name=direct_publish][value="+resp['settings']['direct_publish']+"]").attr("checked", "checked");
+
+                        $("[data-en]").removeClass("active");
+                        $("[data-dp]").removeClass("active");
+                        $("[data-en="+resp['settings']['edit_news']+"]").addClass("active");
+                        $("[data-dp="+resp['settings']['direct_publish']+"]").addClass("active");
+                    }
+
+                    $("#resBox").show();
+                }else{
+                    $(".del_msg").text("کاربر مورد نظر یافت نشد و یا دسترسی ویرایشگر ندارد.").fadeIn().delay(2000).fadeOut();
+                    $("#resBox").delay(3000).hide();
+                }
+            }
+        });
+    });
+
+    $(document).on("click", ".R_butt_blue._save", function () {
+        var checked_ids = [], str;
+        $.each($('#jstree_div').jstree("get_checked", true), function () {
+            checked_ids.push(this.id);
+        });
+        if (checked_ids.length > 0) {
+            str = JSON.stringify(checked_ids);
+        }
+
+        var _id = $("input[name=username]").val();
+        $.ajax({
+            url: "{{ url("system_urm_editors") }}",
+            type: "post",
+            data: {
+                    collections: str,
+                    username: _id,
+                    e1:$(".active[data-en]").attr("data-en"),
+                    e2:$(".active[data-dp]").attr("data-dp"),
+                    _xsrf: '{{ handler.xsrf_token }}'
+            },
+            success: function (resp) {
+                if (resp['status']) {
+                    $(".del_msg").text("اطلاعات با موفقیت ثبت شد.").fadeIn().delay(2000).fadeOut();
+                }else{
+                    $(".del_msg").text("خطا در ثبت اطلاعات. مجدداً تلاش نمایید.").fadeIn().delay(2000).fadeOut();
+                }
+                $("#resBox").delay(3000).hide();
+            }
+        });
+
+    });
+
+</script>
+{% end block bottom_script %}

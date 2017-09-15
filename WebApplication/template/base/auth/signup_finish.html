@@ -1,0 +1,138 @@
+{% extends "../main_template.html" %}
+
+{% block other_head %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/select2/select2_metro_rtl.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.css') }}" />
+{% end other_head body %}
+
+{% block container %}
+<div class="col-md-8 col-sm-8 col-xs-10 col-md-offset-2 col-sm-offset-2 col-xs-offset-1">
+
+    <div class="row">
+        <div class="col-md-12 padding-0">
+            <div class="register_section">
+                <div class="col-md-4 col-sm-4">
+                    <div class="box active">
+                        <div class="sp1">1</div>
+                        <div class="sp2">مرحله اول</div>
+                        <div class="fa fa-arrow-left vertical-middle font-size-18 colorGray"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <div class="box active">
+                        <div class="sp1">2</div>
+                        <div class="sp2">اطلاعات تکمیلی</div>
+                        <div class="fa fa-arrow-left vertical-middle font-size-18 colorGray"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <div class="box active">
+                        <div class="sp1">3</div>
+                        <div class="sp2">ثبت نهایی !</div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="rBox signup">
+        <div class="head">ثبت نهایی !</div>
+        <div class="body">
+
+            <div class="row">
+                <div class="colorBlue font-size-13 col-md-12 text-center margin-10-center">ثبت نام شما با موفقیت انجام شد.</div>
+            </div>
+
+            <div class="row">
+                {% if visitor %}
+                <div class="colorBlue font-size-13 col-md-12 text-center margin-10-center">سیستم شما فعال گردید. </div>
+                <div class="colorBlue font-size-13 col-md-12 text-center margin-10-center">جهت تایید و فعالسازی ایمیل ،به ایمیل خود مراجعه ونسبت به فعالسازی آن اقدام کنید.</div>
+                <div class="colorBlue font-size-13 col-md-12 text-center margin-10-center">پس از آن جهت تایید اطلاعات مدیر سیستم با شما تماس خواهد گرفت.</div>
+                {% else %}
+                <div class="colorBlue font-size-15 col-md-12 text-center margin-10-center">سیستم شما پس از تائید مدیریت سایت فعال میگردد.</div>
+                <div class="colorBlue font-size-13 col-md-12 text-center margin-10-center">جهت تایید و فعالسازی سرویس به ایمیل خود مراجعه ونسبت به فعالسازی آن اقدام کنید.</div>
+                <div class="colorBlue font-size-13 col-md-12 text-center margin-10-center">پس از آن جهت تایید اطلاعات مدیر سیستم با شما تماس خواهد گرفت.</div>
+                {% end %}
+            </div>
+
+            {% if visitor %}
+            <div class="row">
+                <div class="colorBlue font-size-11 col-md-12 text-center margin-10-center">هم اکنون میتوانید با مراجعه به صفحه امور مالی در پنل خود ، اقدام به پرداخت صورت حساب نمایید.</div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 margin-30-center text-center">
+                    <a class="R_butt_blue colorWhite font-size-13" href="{{ reverse_url("system_dashboard") }}">ورود به داشبورد !</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="row">
+                <div class="colorBlue font-size-11 col-md-12 text-center margin-10-center">تائیدیه سیستم در کمتر از 2 ساعت به اطلاع شما خواهد رسید.</div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 margin-30-center text-center">
+                    <a class="R_butt_blue colorWhite font-size-13" href="{{ reverse_url("index") }}">بازگشت به صفحه اصلی</a>
+                </div>
+            </div>
+            {% end %}
+
+        </div>
+    </div>
+
+</div>
+{% end block container %}
+
+
+{% block bottom_script %}
+
+<script type="text/javascript" src="{{ static_url('plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('plugins/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ static_url('plugins/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+
+<script type="text/javascript">
+    jQuery.validator.addMethod("latin_numbers", function (value, element) {
+        return this.optional(element) || /^\w+$/.test(value);
+    }, "Please specify the correct domain for your documents");
+
+    var frm = $("form").validate({
+        errorClass: "colorOrange",
+        {#        focusCleanup: true,#}
+        {#        focusInvalid: true,#}
+        rules: {
+            school_name: "required",
+            email: {
+                required: false,
+                email: true
+            },
+            phone: {
+                required: true,
+                digits: true
+            },
+            address: "required",
+            level: "required"
+        },
+        messages: {
+
+            school_name: "نام مرکز آموزشی را وارد کنید.",
+            email: {
+                email: "آدرس ایمیل نامعتبر است."
+            },
+            address: "آدرس مرکز آموزشی را وارد کنید.",
+            phone: {
+                required: "شماره تماس مرکز آموزشی را وارد کنید.",
+                digits: "شماره تماس فقط شامل اعداد میباشد."
+            },
+            level: "مقطع تحصیلی مرکز آموزشی را وارد کنید."
+        }
+    });
+
+    $(".select").select2({
+        placeholder: "انتخاب کنید"
+    });
+
+
+</script>
+{% end block bottom_script %}
